@@ -11,12 +11,20 @@ import NumberFormat from 'react-number-format';
 function SimpananMain() {
 
     const [simpananlists, setSimpananlists] = useState([]);
+    const [wajib, setWajib] = useState(0);
+    const [pokok, setPokok] = useState(0);
+    const [suka, setSuka] = useState(0);
+    const [totals, setTotals] = useState(0);
 
     const fetchSimpanan = () => {
         axios.get(`http://127.0.0.1:8000/api/simpanan`)
             .then((response) => {
                 const result = response.data;
                 setSimpananlists(result.data);
+                setWajib(result.total[0].wajib);
+                setPokok(result.total[0].pokok)
+                setSuka(result.total[0].sukarela);;
+                setTotals(result.total[0].totals);
     
             })
             .catch(error => console.error(`Error:${error}`));
@@ -26,7 +34,6 @@ function SimpananMain() {
     return (
         <div>
             <div className="content-wrapper">
-                {/* Content Header (Page header) */}
                 <section className="content-header">
                     <div className="container-fluid">
                         <div className="row mb-2">
@@ -46,11 +53,7 @@ function SimpananMain() {
                     <div className="container-fluid">
                         <div className="row">
                             <div className="col-12">
-                                <div className="callout callout-info">
-                                    <h5><i className="fas fa-info" /> Note:</h5>
-                                    This page has been enhanced for printing. Click the print button at the bottom of the invoice to test.
-                                </div>
-                                {/* Main content */}
+                                
                                 <div className="invoice p-3 mb-3">
                                     {/* title row */}
                                     <div className="row">
@@ -67,7 +70,7 @@ function SimpananMain() {
                                         <div className="col-sm-4 invoice-col">
                                             Tampilkan di layar
                                             <address>
-                                                <button type="button" onClick={fetchSimpanan} className="btn btn-primary btn-block"><i className="fa fa-book" /> Tampilkan</button>
+                                                <button type="button" onClick={()=>fetchSimpanan()} className="btn btn-primary btn-block"><i className="fa fa-book" /> Tampilkan</button>
 
                                             </address>
                                         </div>
@@ -123,24 +126,24 @@ function SimpananMain() {
                                         </div>
                                         {/* /.col */}
                                         <div className="col-lg-6 col-sm-12">
-                                            <p className="lead">Amount Due 2/22/2014</p>
+                                            <p className="lead"></p>
                                             <div className="table-responsive">
                                                 <table className="table">
                                                     <tbody><tr>
                                                         <th style={{ width: '50%' }}>Simpanan Pokok</th>
-                                                        <td>$250.30</td>
+                                                        <td><NumberFormat value={pokok} displayType={"text"} thousandSeparator={true} prefix={'Rp'}/></td>
                                                     </tr>
                                                         <tr>
                                                             <th>Total Simpanan Wajib</th>
-                                                            <td>$10.34</td>
+                                                            <td><NumberFormat value={wajib} displayType={"text"} thousandSeparator={true} prefix={'Rp'}/></td>
                                                         </tr>
                                                         <tr>
                                                             <th>Total Simpanan Sukarela</th>
-                                                            <td>$5.80</td>
+                                                            <td><NumberFormat value={suka} displayType={"text"} thousandSeparator={true} prefix={'Rp'}/></td>
                                                         </tr>
                                                         <tr>
                                                             <th>Total:</th>
-                                                            <td>$265.24</td>
+                                                            <td><NumberFormat value={totals} displayType={"text"} thousandSeparator={true} prefix={'Rp'}/></td>
                                                         </tr>
                                                     </tbody></table>
                                             </div>
@@ -149,17 +152,7 @@ function SimpananMain() {
                                     </div>
                                     {/* /.row */}
                                     {/* this row will not appear when printing */}
-                                    <div className="row no-print">
-                                        <div className="col-12">
-                                            <a href="invoice-print.html" rel="noopener" target="_blank" className="btn btn-default"><i className="fas fa-print" /> Print</a>
-                                            <button type="button" className="btn btn-success float-right"><i className="far fa-credit-card" /> Submit
-                                                Payment
-                                            </button>
-                                            <button type="button" className="btn btn-primary float-right" style={{ marginRight: 5 }}>
-                                                <i className="fas fa-download" /> Generate PDF
-                                            </button>
-                                        </div>
-                                    </div>
+                                   
                                 </div>
                                 {/* /.invoice */}
                             </div>{/* /.col */}
