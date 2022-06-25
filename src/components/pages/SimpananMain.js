@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, {useRef, useState } from "react";
 import axios from 'axios'
 import NumberFormat from 'react-number-format';
-
+import Loading from "../template/Loading";
+import AuthUser from "../services/AuthUser";
+import emailjs from '@emailjs/browser';
 
 
 
@@ -10,21 +12,45 @@ import NumberFormat from 'react-number-format';
 
 function SimpananMain() {
 
+    const { http } = AuthUser();
     const [simpananlists, setSimpananlists] = useState([]);
     const [wajib, setWajib] = useState(0);
     const [pokok, setPokok] = useState(0);
     const [suka, setSuka] = useState(0);
     const [totals, setTotals] = useState(0);
+    const [load,setLoad] = useState();
+    const form = useRef();
+    
+
+
+    const sendEmail = (e) => {
+        e.preventDefault();
+        emailjs.sendForm("service_fsqi8cq", "template_51eyhqi", form.current, "qWMhP0JyPLv3Ve5aw").then(
+            (result) => {
+              alert("Message Sent Successfully");
+              console.log(result.text);
+            },
+            (error) => {
+              console.log(error.text);
+            }
+          );
+    }
+   
 
     const fetchSimpanan = () => {
-        axios.get(`http://127.0.0.1:8000/api/simpanan`)
-            .then((response) => {
-                const result = response.data;
+        setLoad(true);
+        http.get('/simpanan',{
+            params: {
+                nik: 218411,
+            }})
+            .then((res) => {
+                const result = res.data;
                 setSimpananlists(result.data);
                 setWajib(result.total[0].wajib);
                 setPokok(result.total[0].pokok)
                 setSuka(result.total[0].sukarela);;
                 setTotals(result.total[0].totals);
+                setLoad(false);
     
             })
             .catch(error => console.error(`Error:${error}`));
@@ -47,7 +73,7 @@ function SimpananMain() {
                                 </ol>
                             </div>
                         </div>
-                    </div>{/* /.container-fluid */}
+                    </div>
                 </section>
                 <section className="content">
                     <div className="container-fluid">
@@ -63,9 +89,8 @@ function SimpananMain() {
                                                 <small className="float-right">Date: 2/10/2014</small>
                                             </h4>
                                         </div>
-                                        {/* /.col */}
+
                                     </div>
-                                    {/* info row */}
                                     <div className="row invoice-info">
                                         <div className="col-sm-4 invoice-col">
                                             Tampilkan di layar
@@ -74,25 +99,22 @@ function SimpananMain() {
 
                                             </address>
                                         </div>
-                                        {/* /.col */}
                                         <div className="col-sm-4 invoice-col">
                                             Kirim ke email
                                             <address>
                                                 <div className="input-group input-group-md">
                                                     <input type="text" className="form-control" />
                                                     <span className="input-group-append">
-                                                        <button type="button" className="btn btn-info btn-flat">Kirim</button>
+                                                        <button type="button" onClick={()=>sendEmail()} className="btn btn-info btn-flat">Kirim</button>
                                                     </span>
                                                 </div>
 
 
                                             </address>
                                         </div>
-                                        {/* /.col */}
                                         <div className="col-sm-4 invoice-col">
 
                                         </div>
-                                        {/* /.col */}
                                     </div>
                                     <div className="row">
                                         <div className="card-body table-responsive p-0" style={{ height: 500 }}>
@@ -105,26 +127,28 @@ function SimpananMain() {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                {simpananlists.map((item, i) => (
-                                                        <tr key={i}>
-                                                            <td>{item.Tgl_penyimpanan}</td>
-                                                            <td><NumberFormat value={item.Simpanan_Wajib} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
-                                                            <td><NumberFormat value={item.Simpanan_Sukarela} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
-                                                        </tr>
+                                                    {load ?
+                                                        <tr>
+                                                            <td colSpan={5} align={'center'}><Loading/></td>
+                                                        </tr> :
 
-                                                    ))}
+                                                        simpananlists.map((item, i) => (
+                                                            <tr key={i}>
+                                                                <td>{item.Tgl_penyimpanan}</td>
+                                                                <td><NumberFormat value={item.Simpanan_Wajib} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                                                                <td><NumberFormat value={item.Simpanan_Sukarela} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                                                            </tr>
+
+                                                        ))}
                                                 </tbody>
+                                                
                                             </table>
                                         </div>
-                                        {/* /.col */}
                                     </div>
-                                    {/* /.row */}
                                     <div className="row">
-                                        {/* accepted payments column */}
                                         <div className="col-6">
-
+                                           
                                         </div>
-                                        {/* /.col */}
                                         <div className="col-lg-6 col-sm-12">
                                             <p className="lead"></p>
                                             <div className="table-responsive">
@@ -148,18 +172,13 @@ function SimpananMain() {
                                                     </tbody></table>
                                             </div>
                                         </div>
-                                        {/* /.col */}
                                     </div>
-                                    {/* /.row */}
-                                    {/* this row will not appear when printing */}
                                    
                                 </div>
-                                {/* /.invoice */}
-                            </div>{/* /.col */}
-                        </div>{/* /.row */}
-                    </div>{/* /.container-fluid */}
+                            </div>
+                        </div>
+                    </div>
                 </section>
-                {/* /.content */}
             </div>
 
         </div>
