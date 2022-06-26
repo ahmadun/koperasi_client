@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {  toast } from 'react-toastify';
 
 export default function AuthUser(){
     const navigate = useNavigate();
@@ -43,6 +44,18 @@ export default function AuthUser(){
         },
         withCredentials:true,
     });
+
+    const toasts = () => {
+        toast.success('Data berhasil diupdate!', {
+            position: "top-right",
+            autoClose: 1000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            });
+    }
     
     return {
         setToken:saveToken,
@@ -50,6 +63,7 @@ export default function AuthUser(){
         user,
         getToken,
         http,
-        logout
+        logout,
+        toasts
     }
 }

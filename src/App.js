@@ -15,6 +15,7 @@ import SimpananMain from './components/pages/SimpananMain';
 import PinjamanMain from './components/pages/PinjamanMain';
 import Register from './components/pages/Register';
 import Login from './components/pages/Login';
+import RegisterAdmin from './components/pages/RegisterAdmin';
 
 const App = () => {
   return (
@@ -27,6 +28,10 @@ const App = () => {
         </Route>
         <Route exact path="/pinjaman" element={<Layout/>}>
           <Route index element={<PinjamanMain/>}/>
+        </Route>
+
+        <Route exact path="/registrasiuser" element={<Layout/>}>
+          <Route index element={<RegisterAdmin/>}/>
         </Route>
 
         <Route path='/register' element={<Register/>}/>

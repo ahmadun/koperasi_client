@@ -47,17 +47,15 @@ const Register = () => {
                                 <div className="col-8">
                                     
                                 </div>
-                                {/* /.col */}
                                 <div className="col-4">
                                     <button type="submit" className="btn btn-primary btn-block">Register</button>
                                 </div>
-                                {/* /.col */}
                             </div>
                         </form>
                        
                     </div>
-                    {/* /.form-box */}
-                </div>{/* /.card */}
+
+                </div>
             </div>
 
         </div>

@@ -36,6 +36,16 @@ export default class Menu extends Component {
                                 </a>
                             </li>
 
+                            <li className="nav-item">
+                            <NavLink to="/registrasiuser" className="nav-link">
+                                    <i className="nav-icon fas fa-th" />
+                                    <p>
+                                        Registrasi Anggota
+                                    </p>
+                                    </NavLink>
+                            </li>
+
+
                             <li className="nav-header">ANGGOTA</li>
                             <li className="nav-item">
                                 <NavLink to="/simpanan" className="nav-link">

@@ -25,15 +25,7 @@ function SimpananMain() {
 
     const sendEmail = (e) => {
         e.preventDefault();
-        emailjs.sendForm("service_fsqi8cq", "template_51eyhqi", form.current, "qWMhP0JyPLv3Ve5aw").then(
-            (result) => {
-              alert("Message Sent Successfully");
-              console.log(result.text);
-            },
-            (error) => {
-              console.log(error.text);
-            }
-          );
+       
     }
    
 
@@ -55,7 +47,6 @@ function SimpananMain() {
             })
             .catch(error => console.error(`Error:${error}`));
     }
-
 
     return (
         <div>
