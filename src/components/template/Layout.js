@@ -12,7 +12,7 @@ function Layout(props) {
       <Header/>
       <Menu/>
       <Outlet/>
-      <Footer/>    
+      {/* <Footer/>     */}
     </div>
   )
 }

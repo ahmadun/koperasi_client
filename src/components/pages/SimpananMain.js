@@ -1,9 +1,9 @@
-import React, {useRef, useState } from "react";
+import React, {useRef, useState,useContext } from "react";
 import axios from 'axios'
 import NumberFormat from 'react-number-format';
 import Loading from "../template/Loading";
 import AuthUser from "../services/AuthUser";
-import emailjs from '@emailjs/browser';
+import { AuthContext } from '../../App';
 
 
 
@@ -19,7 +19,7 @@ function SimpananMain() {
     const [suka, setSuka] = useState(0);
     const [totals, setTotals] = useState(0);
     const [load,setLoad] = useState();
-    const form = useRef();
+    const { state } = useContext(AuthContext)
     
 
 
@@ -28,12 +28,11 @@ function SimpananMain() {
        
     }
    
-
     const fetchSimpanan = () => {
         setLoad(true);
-        http.get('/simpanan',{
+        http.get('api/simpanan',{
             params: {
-                nik: 218411,
+                nik: state.nik,
             }})
             .then((res) => {
                 const result = res.data;
@@ -72,7 +71,6 @@ function SimpananMain() {
                             <div className="col-12">
                                 
                                 <div className="invoice p-3 mb-3">
-                                    {/* title row */}
                                     <div className="row">
                                         <div className="col-12">
                                             <h4>

@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState,useContext } from 'react'
 import NumberFormat from 'react-number-format';
 import AuthUser from '../services/AuthUser'
 import Loading from '../template/Loading';
-
+import { AuthContext } from '../../App';
 
 
 function PinjamanMain() {
-
+    const { state } = useContext(AuthContext)
     const { http } = AuthUser();
     const [pinjamanlists, setPinjamanlists] = useState([]);
     const [pinjamandetails, setPinjamandetails] = useState([]);
@@ -20,7 +20,11 @@ function PinjamanMain() {
     }, []);
 
     const getListPinjaman = () => {
-        http.get('/pinjaman').then((res) => {
+        http.get('api/pinjaman',{
+            params: {
+                nik: state.nik,
+            }
+        }).then((res) => {
             setPinjamanlists(res.data.data);
         }).catch(error => console.error(`Error:${error}`));
     }
@@ -36,9 +40,9 @@ function PinjamanMain() {
         } else {
             setTitleTable('Daftar Pinjaman Konsumptif');
         }
-        http.get('/pinjaman/detail', {
+        http.get('api/pinjaman/detail', {
             params: {
-                nik: 218411,
+                nik: state.nik,
                 code: kode
             }
         }).then((res) => {

@@ -1,42 +1,53 @@
 import axios from 'axios'
-import React, { useEffect } from 'react'
+import React, { useState,useContext  } from 'react'
+import AuthUser from '../services/AuthUser'
+import { AuthContext } from '../../App';
 
 
-const http=axios.create({
-    baseURL: 'http://localhost:8000',
-    headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-    },
-    withCredentials:true,
-});
+function Login() {
 
+    const {http,setToken} = AuthUser();
+    const { dispatch } = useContext(AuthContext)
+    const [nik,setNik] = useState();
+    const [password,setPassword] = useState();
 
-async function postLogin(){
-    const csrf=await http.get('/sanctum/csrf-cookie');
-    console.log('csrf=',csrf);
-    const login=await http.post('/api/auth/login',{
-        email:'ahmadunis@gmail.com',
-        password:'ahmadunis'
-    });
+    async function postLogin(e){
+        
+     
 
-    console.log('login=',login);
-}
+     
+        http.get('/sanctum/csrf-cookie').then(response => {
+            http.post('api/auth/login',{
+                nik:nik,
+                password:password
+            }).then((res)=>{
+                dispatch({
+                    type: "LOGIN",
+                    payload: res.data
+                })
 
-const Login = () => {
+                setToken(res.data.nik,res.data.token);
+        
+                
+            })
+        });
+      
+    
+    }
+
 
     return (
         <div className="hold-transition login-page">
             <div className="login-box">
-                {/* /.login-logo */}
                 <div className="card card-outline card-primary">
                     <div className="card-header text-center">
                         <a href="../../index2.html" className="h1"><b>Admin</b>LTE</a>
                     </div>
                     <div className="card-body">
                         <p className="login-box-msg">Sign in to start your session</p>
-                        <form>
+                        <form onSubmit={postLogin}>
                             <div className="input-group mb-3">
-                                <input type="email" className="form-control" placeholder="Email" />
+                                <input type="text" onChange={e=>setNik(e.target.value)} className="form-control" placeholder="NIK" />
                                 <div className="input-group-append">
                                     <div className="input-group-text">
                                         <span className="fas fa-envelope" />
@@ -44,7 +55,7 @@ const Login = () => {
                                 </div>
                             </div>
                             <div className="input-group mb-3">
-                                <input type="password" className="form-control" placeholder="Password" />
+                                <input type="password" onChange={e=>setPassword(e.target.value)} className="form-control" placeholder="Password" />
                                 <div className="input-group-append">
                                     <div className="input-group-text">
                                         <span className="fas fa-lock" />
@@ -55,15 +66,12 @@ const Login = () => {
                                 <div className="col-8">
                               
                                 </div>
-                                {/* /.col */}
                                 <div className="col-4">
-                                    <button type="button" onClick={postLogin} className="btn btn-primary btn-block">Sign In</button>
+                                    <button type="submit" className="btn btn-primary btn-block">Sign In</button>
                                 </div>
-                                {/* /.col */}
                             </div>
                         </form>
                        
-                        {/* /.social-auth-links */}
                         <p className="mb-1">
                             <a href="forgot-password.html">I forgot my password</a>
                         </p>
@@ -71,9 +79,7 @@ const Login = () => {
                             <a href="register.html" className="text-center">Register a new membership</a>
                         </p>
                     </div>
-                    {/* /.card-body */}
                 </div>
-                {/* /.card */}
             </div></div>
 
     )

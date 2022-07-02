@@ -6,6 +6,7 @@ import {  toast } from 'react-toastify';
 export default function AuthUser(){
     const navigate = useNavigate();
 
+
     const getToken = () =>{
         const tokenString = sessionStorage.getItem('token');
         const userToken = JSON.parse(tokenString);
@@ -38,12 +39,16 @@ export default function AuthUser(){
     }
 
     const http=axios.create({
-        baseURL: 'http://localhost:8000/api',
+
+        baseURL: 'http://localhost:8000',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
+            'Authorization': `Bearer ${token}`,
         },
         withCredentials:true,
     });
+
+
 
     const toasts = () => {
         toast.success('Data berhasil diupdate!', {

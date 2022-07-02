@@ -17,7 +17,7 @@ function RegisterAdmin() {
   const ChecNik = (e) => {
     e.preventDefault();
     http
-      .get("/checknama", {
+      .get("api/checknama", {
         params: {
           nik: nik,
         },
@@ -47,7 +47,7 @@ function RegisterAdmin() {
 
   async function SaveUser() {
     await http
-      .post("/auth/register", {
+      .post("api/auth/register", {
         nik: nik,
         name: name,
         no_hp: no_hp,
