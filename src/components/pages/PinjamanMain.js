@@ -148,7 +148,7 @@ function PinjamanMain() {
                             <div className="col-sm-6">
                                 <ol className="breadcrumb float-sm-right">
                                     <li className="breadcrumb-item"><a href="#">Home</a></li>
-                                    <li className="breadcrumb-item active">Invoice</li>
+                                    <li className="breadcrumb-item active">Pinjaman</li>
                                 </ol>
                             </div>
                         </div>

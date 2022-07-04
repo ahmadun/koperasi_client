@@ -79,7 +79,7 @@ function RegisterAdmin() {
         email: email,
       })
       .then((res) => {
-        toasts()
+        toasts("sucess","Data Berhasil disimpan !")
       })
       .catch((error) => console.error(`Error:${error}`));
   }
@@ -138,14 +138,14 @@ function RegisterAdmin() {
         <div className="container-fluid">
           <div className="row mb-2">
             <div className="col-sm-6">
-              <h1>Pinjaman</h1>
+              <h1>Registrasi</h1>
             </div>
             <div className="col-sm-6">
               <ol className="breadcrumb float-sm-right">
                 <li className="breadcrumb-item">
                   <a href="#">Home</a>
                 </li>
-                <li className="breadcrumb-item active">Invoice</li>
+                <li className="breadcrumb-item active">Registrasi</li>
               </ol>
             </div>
           </div>
@@ -159,7 +159,7 @@ function RegisterAdmin() {
               <div className="card card-primary">
                 <div className="card-header">
                   <h3 className="card-title">
-                    Quick Example <small>jQuery Validation</small>
+                    Registrasi Anggota
                   </h3>
                 </div>
                 <div>

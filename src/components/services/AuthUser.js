@@ -50,16 +50,31 @@ export default function AuthUser(){
 
 
 
-    const toasts = () => {
-        toast.success('Data berhasil diupdate!', {
-            position: "top-right",
-            autoClose: 1000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            });
+    const toasts = (status,meessage) => {
+        switch(status) {
+            case 'error':
+                toast.error(meessage, {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    });
+              break;
+            default:
+                toast.success(meessage, {
+                    position: "top-right",
+                    autoClose: 1000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    });
+          }
+       
     }
     
     return {

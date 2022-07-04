@@ -54,12 +54,12 @@ function SimpananMain() {
                     <div className="container-fluid">
                         <div className="row mb-2">
                             <div className="col-sm-6">
-                                <h1>Invoice</h1>
+                                <h1>Simpanan</h1>
                             </div>
                             <div className="col-sm-6">
                                 <ol className="breadcrumb float-sm-right">
                                     <li className="breadcrumb-item"><a href="#">Home</a></li>
-                                    <li className="breadcrumb-item active">Invoice</li>
+                                    <li className="breadcrumb-item active">Simpanan</li>
                                 </ol>
                             </div>
                         </div>

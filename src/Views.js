@@ -12,6 +12,8 @@ import Login from "./components/pages/Login";
 import RegisterAdmin from "./components/pages/RegisterAdmin";
 import ProtectedRoutes from "./ProtectedRoutes";
 import KasbonEntry from "./components/pages/KasbonEntry";
+import BelanjaKontan from "./components/pages/BelanjaKontan";
+import SalaryData from "./components/pages/SalaryData";
 
 const Views = () => {
   return (
@@ -34,6 +36,12 @@ const Views = () => {
         </Route>
         <Route exact path="/kasbonentry" element={<Layout />}>
           <Route index element={<KasbonEntry />} />
+        </Route>
+        <Route exact path="/belanjakontan" element={<Layout />}>
+          <Route index element={<BelanjaKontan />} />
+        </Route>
+        <Route exact path="/salarydata" element={<Layout />}>
+          <Route index element={<SalaryData />} />
         </Route>
       </Route>
     </Routes>

@@ -5,11 +5,9 @@ import { AuthContext } from '../../App';
 
 
 function Menu() {
-    
+
 
     const { state } = useContext(AuthContext)
-
-
     return (
         <aside className="main-sidebar sidebar-dark-primary elevation-4">
             <a href="index3.html" className="brand-link">
@@ -28,31 +26,28 @@ function Menu() {
                 <nav className="mt-2">
                     <ul className="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <li className="nav-item has-treeview">
-                            <NavLink to="/" className="nav-link active">
+                            <NavLink to="/" className="nav-link">
                                 <i className="nav-icon fas fa-tachometer-alt" />
                                 <p>Dashboard</p>
                             </NavLink>
                         </li>
                         <li className="nav-item">
-                            <a href="pages/widgets.html" className="nav-link">
+                            <NavLink to="/kasbonentry" className="nav-link">
                                 <i className="nav-icon fas fa-th" />
                                 <p>
-                                    Transaksi
+                                    Transaksi Kasbon
                                     <span className="right badge badge-danger">Kasir</span>
                                 </p>
-                            </a>
+                            </NavLink>
                         </li>
-
                         <li className="nav-item">
-                        <NavLink to="/registrasiuser" className="nav-link">
+                            <NavLink to="/registrasiuser" className="nav-link">
                                 <i className="nav-icon fas fa-th" />
                                 <p>
                                     Registrasi Anggota
                                 </p>
-                                </NavLink>
+                            </NavLink>
                         </li>
-
-
                         <li className="nav-header">ANGGOTA</li>
                         <li className="nav-item">
                             <NavLink to="/simpanan" className="nav-link">
@@ -68,10 +63,15 @@ function Menu() {
                                 <p>Pinjaman</p>
                             </NavLink>
                         </li>
+                        <li className="nav-item">
+                            <NavLink to="/belanjakontan" className="nav-link">
+                                <i className="nav-icon far fa-image" />
+                                <p>Belanja Kontan</p>
+                            </NavLink>
+                        </li>
                     </ul>
                 </nav>
             </div>
-            {/* /.sidebar */}
         </aside>
     )
 }
