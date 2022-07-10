@@ -1,10 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState,useEffect } from "react";
 import AuthUser from "../services/AuthUser";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function RegisterAdmin() {
-  const { http,toasts } = AuthUser();
+  const { http, toasts,user } = AuthUser();
   const [nik, setNik] = useState("");
   const [name, setName] = useState("");
   const [no_hp, setNo_hp] = useState("");
@@ -13,6 +13,8 @@ function RegisterAdmin() {
   const [password_confirm, setPassword_confirm] = useState("");
   const [statususer, setStatususer] = useState();
   const nohpRef = useRef(null);
+
+ 
 
   const ChecNik = (e) => {
     e.preventDefault();
@@ -54,7 +56,7 @@ function RegisterAdmin() {
         email: email,
         password: password,
       })
-      .then((res) => {toasts()})
+      .then((res) => { toasts("succes", "Data Berhasil Tersimpan !") })
       .catch((error) => console.error(`Error:${error}`));
   }
 
@@ -67,19 +69,24 @@ function RegisterAdmin() {
         email: email,
         password: password,
       })
-      .then((res) => {toasts()})
+      .then((res) => {
+        console.log(res)
+
+        toasts("succes", "Data Berhasil Tersimpan !");
+      })
       .catch((error) => console.error(`Error:${error}`));
   }
 
   async function UpdateEmail() {
-      await http
+    await http
       .post("/auth/updateemail", {
         nik: nik,
         no_hp: no_hp,
         email: email,
       })
       .then((res) => {
-        toasts("sucess","Data Berhasil disimpan !")
+        console.log(res)
+        toasts("succes", "Data Berhasil Tersimpan !");
       })
       .catch((error) => console.error(`Error:${error}`));
   }
@@ -104,36 +111,36 @@ function RegisterAdmin() {
     }
   };
 
-  const ButtonType=()=>{
-    if(statususer===3 && password=="" && password_confirm==""){
+  const ButtonType = () => {
+    if (statususer === 3 && password == "" && password_confirm == "") {
       return (
         <button
-        type="button"
-        className="btn btn-primary"
-        data-toggle="modal"
-        data-target="#modal-default"
-      >
-        Simpan
-      </button>
+          type="button"
+          className="btn btn-primary"
+          data-toggle="modal"
+          data-target="#modal-default"
+        >
+          Simpan
+        </button>
       );
-    }else{
+    } else {
       return (
         <button
-        type="button"
-        onClick={() => RegisterData()}
-        className="btn btn-primary"
-      >
-        Simpan
-      </button>
+          type="button"
+          onClick={() => RegisterData()}
+          className="btn btn-primary"
+        >
+          Simpan
+        </button>
       );
     }
 
   }
 
   return (
-    
+
     <div className="content-wrapper">
-      <ToastContainer theme={"colored"}/>
+      <ToastContainer theme={"colored"} />
       <section className="content-header">
         <div className="container-fluid">
           <div className="row mb-2">
@@ -172,7 +179,7 @@ function RegisterAdmin() {
                           className="input-group input-group-md"
                           onSubmit={ChecNik}
                         >
-                          <input
+                          <input autoComplete="off"
                             type="text"
                             value={nik}
                             onChange={(e) => setNik(e.target.value)}
@@ -191,7 +198,7 @@ function RegisterAdmin() {
 
                       <div className="col-sm-8">
                         <label>NAME</label>
-                        <input
+                        <input autoComplete="off"
                           type="text"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
@@ -209,7 +216,7 @@ function RegisterAdmin() {
                       <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                         <div className="form-group">
                           <label htmlFor="nohp">No HP</label>
-                          <input
+                          <input autoComplete="off"
                             type="text"
                             ref={nohpRef}
                             value={no_hp}
@@ -219,8 +226,8 @@ function RegisterAdmin() {
                           />
                         </div>
                         <div className="form-group">
-                          <label htmlFor="email">Email</label>
-                          <input
+                          <label htmlFor="email">NIK</label>
+                          <input autoComplete="off"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -230,7 +237,7 @@ function RegisterAdmin() {
                         </div>
                         <div className="form-group">
                           <label htmlFor="password">Password</label>
-                          <input
+                          <input autoComplete="off"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -242,7 +249,7 @@ function RegisterAdmin() {
                           <label htmlFor="password_confirm">
                             Confirm Password
                           </label>
-                          <input
+                          <input autoComplete="off"
                             type="password"
                             value={password_confirm}
                             onChange={(e) =>
@@ -252,21 +259,12 @@ function RegisterAdmin() {
                             id="password_confirm"
                           />
                         </div>
-                        <div className="form-group mb-0">
-                          <div className="custom-control custom-checkbox">
-                            <input
-                              type="checkbox"
-                              name="terms"
-                              className="custom-control-input"
-                              id="exampleCheck1"
-                            />
-                          </div>
-                        </div>
+                       
                       </div>
                     </div>
                   </div>
                   <div className="card-footer">
-                   <ButtonType/>
+                    <ButtonType />
                   </div>
                 </div>
               </div>
