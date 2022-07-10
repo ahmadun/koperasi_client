@@ -1,19 +1,21 @@
-import { useContext } from "react";
+import { useContext,useEffect } from "react";
 import { useLocation } from "react-router";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet,useNavigate} from "react-router-dom";
 import { AuthContext } from './App'
+import AuthUser from "./components/services/AuthUser";
 
 
 
 const ProtectedRoutes = () => {
-  const { state } = useContext(AuthContext)
+  const navigate = useNavigate();
+  const {user} = AuthUser();
   const location = useLocation();
 
-  return state.isAuthenticated ? (
+  return user ? (
     <Outlet />
   ) : (
-    // <Navigate to="/login" replace state={{ from: location }} />
-    <Outlet />
+
+    <Navigate to="/login" replace state={{ from: location }} />
   );
 };
 

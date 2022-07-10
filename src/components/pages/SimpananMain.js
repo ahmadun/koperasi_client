@@ -12,7 +12,7 @@ import { AuthContext } from '../../App';
 
 function SimpananMain() {
 
-    const { http } = AuthUser();
+    const { http,user } = AuthUser();
     const [simpananlists, setSimpananlists] = useState([]);
     const [wajib, setWajib] = useState(0);
     const [pokok, setPokok] = useState(0);

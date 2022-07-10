@@ -49,7 +49,6 @@ export default function AuthUser(){
     });
 
 
-
     const toasts = (status,meessage) => {
         switch(status) {
             case 'error':

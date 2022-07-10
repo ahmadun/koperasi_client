@@ -2,18 +2,19 @@ import axios from 'axios'
 import React, { useState,useContext  } from 'react'
 import AuthUser from '../services/AuthUser'
 import { AuthContext } from '../../App';
+import { ToastContainer } from 'react-toastify';
 
 
 function Login() {
 
-    const {http,setToken} = AuthUser();
+    const {http,setToken,toasts} = AuthUser();
     const { dispatch } = useContext(AuthContext)
     const [nik,setNik] = useState();
     const [password,setPassword] = useState();
 
     async function postLogin(e){
         
-     
+     e.preventDefault()
 
      
         http.get('/sanctum/csrf-cookie').then(response => {
@@ -21,30 +22,39 @@ function Login() {
                 nik:nik,
                 password:password
             }).then((res)=>{
-                dispatch({
-                    type: "LOGIN",
-                    payload: res.data
-                })
+                if(res.data.isAuthenticated==true)
+                {
+                    dispatch({
+                        type: "LOGIN",
+                        payload: res.data
+                    })
+    
+                    setToken(res.data.nik,res.data.token);
 
-                setToken(res.data.nik,res.data.token);
+                }else{
+                    toasts("error", "User atau Password anda Salah !");
+                    
+                }
+               
         
                 
             })
         });
       
-    
+ 
     }
 
 
     return (
         <div className="hold-transition login-page">
+            <ToastContainer theme={"colored"} />
             <div className="login-box">
                 <div className="card card-outline card-primary">
                     <div className="card-header text-center">
-                        <a href="../../index2.html" className="h1"><b>Admin</b>LTE</a>
+                        <a className="h1"><b>Koperasi</b> SBI</a>
                     </div>
                     <div className="card-body">
-                        <p className="login-box-msg">Sign in to start your session</p>
+                        <p className="login-box-msg">Silahkan Login</p>
                         <form onSubmit={postLogin}>
                             <div className="input-group mb-3">
                                 <input type="text" onChange={e=>setNik(e.target.value)} className="form-control" placeholder="NIK" />
@@ -72,12 +82,7 @@ function Login() {
                             </div>
                         </form>
                        
-                        <p className="mb-1">
-                            <a href="forgot-password.html">I forgot my password</a>
-                        </p>
-                        <p className="mb-0">
-                            <a href="register.html" className="text-center">Register a new membership</a>
-                        </p>
+                
                     </div>
                 </div>
             </div></div>

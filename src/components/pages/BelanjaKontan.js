@@ -85,7 +85,7 @@ function BelanjaKontan() {
                                                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                                                     <div className="form-group">
                                                         <label htmlFor="nohp">Jumlah Belanja</label>
-                                                        <NumberFormat autoFocus  thousandSeparator={true} className="form-control" value={amount} onChange={e => setAmount(e.target.value)} name="amount" />
+                                                        <NumberFormat autoFocus thousandSeparator={true} className="form-control" value={amount} onChange={e => setAmount(e.target.value)} name="amount" />
                                                     </div>
                                                 </div>
                                             </div>
