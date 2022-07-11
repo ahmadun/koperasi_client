@@ -4,15 +4,12 @@ import NumberFormat from 'react-number-format';
 import Loading from "../template/Loading";
 import AuthUser from "../services/AuthUser";
 import { AuthContext } from '../../App';
-
-
-
-
+import { ToastContainer } from "react-toastify";
 
 
 function SimpananMain() {
 
-    const { http,user } = AuthUser();
+    const { http,toasts } = AuthUser();
     const [simpananlists, setSimpananlists] = useState([]);
     const [wajib, setWajib] = useState(0);
     const [pokok, setPokok] = useState(0);
@@ -23,8 +20,23 @@ function SimpananMain() {
     
 
 
-    const sendEmail = (e) => {
-        e.preventDefault();
+    const sendEmail = () => {
+
+
+        http.get('api/simpanan/mail',{
+            params: {
+                nik: state.nik,
+            }})
+            .then((res) => {
+                if(res.data.status){
+                    toasts("succes", "Data Berhasil Terkirim !");
+                }else{
+                    toasts("error", "Data Gagal Tersimpan !");
+                }
+            
+    
+            })
+            .catch(error => console.error(`Error:${error}`));
        
     }
    
@@ -50,6 +62,7 @@ function SimpananMain() {
     return (
         <div>
             <div className="content-wrapper">
+            <ToastContainer theme={"colored"} />
                 <section className="content-header">
                     <div className="container-fluid">
                         <div className="row mb-2">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,useContext } from "react";
 import NumberFormat from 'react-number-format';
 import AuthUser from "../services/AuthUser";
 import { ToastContainer } from 'react-toastify';
@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { toast } from 'react-toastify';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { AuthContext } from "../../App";
 
 
 function KasbonEntry() {
@@ -25,6 +26,7 @@ function KasbonEntry() {
   const[notalock,setNotalock]=useState(false);
   const[nikalock,setNikalock]=useState(false);
   const[savelock,setSavelock]=useState(true);
+  const { state } = useContext(AuthContext);
   const [formAddone, setFormAddone] = useState({
     form: 1,
     nota:"",
@@ -115,7 +117,7 @@ function KasbonEntry() {
         formAddone.item="NOTA";
         formAddone.nik = nik;
         formAddone.date = oneDate;
-        formAddone.user = "aham";
+        formAddone.user =state.nik
         formAddone.price = formAddone.price.replace(',', '');
         const newData = (data) => ([...data, formAddone])
         setTableData(newData);
@@ -140,7 +142,7 @@ function KasbonEntry() {
 
         formAddtwo.nik = nik;
         formAddtwo.nota=notaitem;
-        formAddtwo.user = "aham";
+        formAddtwo.user =state.nik
         formAddtwo.date = oneDate;
         formAddtwo.price = formAddtwo.price.replace(',', '');     
         const newData = (data) => ([...data, formAddtwo])
@@ -368,7 +370,7 @@ function KasbonEntry() {
               </div>
             </div>
           </div>
-          <div className="col-6" style={{ backgroundColor: "lightgrey" }}>
+          <div className="col-6" style={{ backgroundColor: "#EDF9F3" }}>
             <div className="row">
               <div className="col-12">
                 <div style={{ marginTop: "5px" }}>
@@ -410,7 +412,7 @@ function KasbonEntry() {
             <div className="row">
 
               <div className="con" style={{ position: "relative" }}>
-                <div className="con-bottom" style={{ position: "fixed", bottom: "0", height: 250, width: "100%", backgroundColor: "yellow" }}>
+                <div className="con-bottom" style={{ position: "fixed", bottom: "0", height: 250, width: "100%", backgroundColor:"#CEEFDE"}}>
                   <div className="row">
                     <div className="col-12">
                       <div style={{ paddingBottom: 8, paddingTop: 15, borderBottom: "2px solid black", fontSize: 20 }}>

@@ -5,9 +5,10 @@ import Loading from '../template/Loading';
 import { AuthContext } from '../../App';
 
 
+
 function PinjamanMain() {
     const { state } = useContext(AuthContext)
-    const { http } = AuthUser();
+    const { http,nik } = AuthUser();
     const [pinjamanlists, setPinjamanlists] = useState([]);
     const [pinjamandetails, setPinjamandetails] = useState([]);
     const [totals, setTotals] = useState([]);
@@ -15,14 +16,42 @@ function PinjamanMain() {
     const [titleTable, setTitleTable] = useState('');
     const [load, setLoad] = useState();
 
+
+
+
+
     useEffect(() => {
-        getListPinjaman();
+      
+
+        if(!state.isAuthenticated)
+        {
+            getnik().then(res=>{
+          
+               getListPinjaman(res.data.nik);
+
+            })
+
+        }else{
+
+            getListPinjaman(state.nik);
+
+        }
+
+   
+     
+   
     }, []);
 
-    const getListPinjaman = () => {
+
+    const getnik=()=>{
+     
+       return http.get('/api/user')
+    }
+
+    const getListPinjaman = (nik) => {
         http.get('api/pinjaman',{
             params: {
-                nik: state.nik,
+                nik: nik,
             }
         }).then((res) => {
             setPinjamanlists(res.data.data);

@@ -19,6 +19,7 @@ export default function AuthUser(){
         return user_detail;
     }
 
+   
 
 
     const [token,setToken] = useState(getToken());
@@ -47,6 +48,8 @@ export default function AuthUser(){
         },
         withCredentials:true,
     });
+
+
 
 
     const toasts = (status,meessage) => {

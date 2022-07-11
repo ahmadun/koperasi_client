@@ -16,7 +16,7 @@ function BelanjaKontan() {
         e.preventDefault();
         await http
             .post("api/saveblgkontan", {
-                nik:220021,
+                nik:state.nik,
                 jumlah: amount.replace(',',''),
                 tgl: oneDate,
 

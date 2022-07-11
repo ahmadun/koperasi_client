@@ -1,7 +1,8 @@
-import React, { useState,useRef } from 'react'
+import React, { useState,useRef,useContext } from 'react'
 import NumberFormat from 'react-number-format';
 import { ToastContainer } from 'react-toastify';
 import * as XLSX from 'xlsx'
+import { AuthContext } from '../../App';
 import AuthUser from '../services/AuthUser';
 
 function SalaryData() {
@@ -17,6 +18,7 @@ function SalaryData() {
     const basicRef = useRef(null);
     const inputRef = React.createRef();
     const [sts,seSts]=useState(false);
+    const { state } = useContext(AuthContext);
     const [newData,setNewData] =useState ({
         nik: 0,
         basic_salary: 0,
@@ -71,7 +73,7 @@ function SalaryData() {
         newData.basic_salary=basic.replace(',','');
         newData.last_salary=last.replace(',','');
         newData.month=month.replace(',','');
-        newData.created_by="ahmadun";
+        newData.created_by=state.nik
         if(sts){
             newData.mode=1;
         }else{

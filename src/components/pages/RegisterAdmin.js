@@ -1,10 +1,10 @@
-import React, { useRef, useState,useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import AuthUser from "../services/AuthUser";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function RegisterAdmin() {
-  const { http, toasts,user } = AuthUser();
+  const { http, toasts, user } = AuthUser();
   const [nik, setNik] = useState("");
   const [name, setName] = useState("");
   const [no_hp, setNo_hp] = useState("");
@@ -14,7 +14,7 @@ function RegisterAdmin() {
   const [statususer, setStatususer] = useState();
   const nohpRef = useRef(null);
 
- 
+
 
   const ChecNik = (e) => {
     e.preventDefault();
@@ -216,7 +216,7 @@ function RegisterAdmin() {
                       <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                         <div className="form-group">
                           <label htmlFor="nohp">No HP</label>
-                          <input autoComplete="off"
+                          <input
                             type="text"
                             ref={nohpRef}
                             value={no_hp}
@@ -226,40 +226,36 @@ function RegisterAdmin() {
                           />
                         </div>
                         <div className="form-group">
-                          <label htmlFor="email">NIK</label>
-                          <input autoComplete="off"
+                          <label htmlFor="email">EMAIL</label>
+                          <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="form-control"
-                            id="email"
+
                           />
                         </div>
                         <div className="form-group">
                           <label htmlFor="password">Password</label>
-                          <input autoComplete="off"
+                          <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="form-control"
-                            id="password"
                           />
                         </div>
                         <div className="form-group">
                           <label htmlFor="password_confirm">
                             Confirm Password
                           </label>
-                          <input autoComplete="off"
+                          <input
                             type="password"
                             value={password_confirm}
-                            onChange={(e) =>
-                              setPassword_confirm(e.target.value)
-                            }
+                            onChange={(e) => setPassword_confirm(e.target.value)}
                             className="form-control"
-                            id="password_confirm"
                           />
                         </div>
-                       
+
                       </div>
                     </div>
                   </div>

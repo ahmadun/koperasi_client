@@ -35,12 +35,12 @@ function Header() {
                     </li>
                     <li className="nav-item dropdown user-menu">
                         <a href="#" className="nav-link dropdown-toggle" data-toggle="dropdown">
-                            <img src="../../dist/img/user2-160x160.jpg" className="user-image img-circle elevation-2" alt="User Image" />
+                            <img src="../../dist/img/avatar5.png" className="user-image img-circle elevation-2" alt="User Image" />
                             <span className="d-none d-md-inline"><b>{state.name}</b></span>
                         </a>
                         <ul className="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                             <li className="user-header bg-primary">
-                                <img src="../../dist/img/user2-160x160.jpg" className="img-circle elevation-2" alt="User Image" />
+                                <img src="../../dist/img/avatar5.png" className="img-circle elevation-2" alt="User Image" />
                                 <p>
                                     {state.name}
                                     <small>{state.nik}</small>
@@ -48,7 +48,6 @@ function Header() {
                             </li>
 
                             <li className="user-footer">
-                                <a href="#" className="btn btn-default btn-flat">Profile</a>
                                 <a onClick={()=>logOut()} className="btn btn-default btn-flat float-right">Sign out</a>
                             </li>
                         </ul>
