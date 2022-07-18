@@ -1,4 +1,4 @@
-import React, { useState,useRef,useContext } from 'react'
+import React, { useState, useRef, useContext } from 'react'
 import NumberFormat from 'react-number-format';
 import { ToastContainer } from 'react-toastify';
 import * as XLSX from 'xlsx'
@@ -17,85 +17,91 @@ function SalaryData() {
     const [month, setMonth] = useState("");
     const basicRef = useRef(null);
     const inputRef = React.createRef();
-    const [sts,seSts]=useState(false);
+    const nikRef = useRef(null);
+    const [sts, seSts] = useState(false);
     const { state } = useContext(AuthContext);
-    const [newData,setNewData] =useState ({
+    const [newData, setNewData] = useState({
         nik: 0,
         basic_salary: 0,
         last_salary: 0,
-        last_month_pay: 0,
-        created_by:"",
-        mode:1
-      });
+        last_month_pay: "",
+        created_by: "",
+        mode: 1
+    });
 
-      function clearScreen(){
+    function clearScreen() {
         setNiknew('');
         setBasic('');
         setLast('');
         setLast('');
         setMonth('');
         setName('');
-      }
+    }
 
-    const displayData=(nik)=>{
-  
+    const clearForm = () => {
+        nikRef.current.focus();
+        clearScreen()
+      
+    }
+
+    const displayData = (nik) => {
+
         seSts(true);
-        const datanow = salaryData.filter((newData) => newData.nik === nik);    
+        const datanow = salaryData.filter((newData) => newData.nik === nik);
         datanow.map((item, i) => {
             setNiknew(item.nik)
             setName(item.name)
             setBasic(item.basic_salary)
             setLast(item.last_salary)
             setMonth(item.last_month_pay)
-    });
+        });
 
     }
 
     const ChecNik = (e) => {
         e.preventDefault();
         http
-          .get("api/checknama", {
-            params: {
-              nik: niknew,
-            },
-          })
-          .then((res) => {
-            setName(res.data.data); 
-            inputRef.current.focus();
-          
-          })
-          .catch((error) => console.error(`Error:${error}`));
-      };
+            .get("api/checknama", {
+                params: {
+                    nik: niknew,
+                },
+            })
+            .then((res) => {
+                setName(res.data.data);
+                inputRef.current.focus();
 
-    const addNew=async(e)=>{
+            })
+            .catch((error) => console.error(`Error:${error}`));
+    };
+
+    const addNew = async (e) => {
         e.preventDefault();
-        newData.nik=niknew;
-        newData.basic_salary=basic.replace(',','');
-        newData.last_salary=last.replace(',','');
-        newData.month=month.replace(',','');
-        newData.created_by=state.nik
-        if(sts){
-            newData.mode=1;
-        }else{
-            newData.mode=2;
+        newData.nik = niknew;
+        newData.basic_salary = basic.replace(',', '');
+        newData.last_salary = last.replace(',', '');
+        newData.last_month_pay = month;
+        newData.created_by = state.nik
+        if (sts) {
+            newData.mode = 1;
+        } else {
+            newData.mode = 2;
         }
 
-
         await http
-            .post("api/addnew",  newData )
+            .post("api/addnew", newData)
             .then((res) => {
-                if(res.data.status==true){
+                if (res.data.status == true) {
                     toasts("succes", "Data Berhasil Tersimpan !");
                     clearScreen();
                     seSts(false);
                     getData()
-                }else {
-                    if(res.data.data==2627){
+                } else {
+                    if (res.data.data == 2627) {
                         toasts("error", "Data sudah ada!");
-                    }else{
+                    } else {
                         toasts("error", "Data Gagal Tersimpan !");
                     }
-                    
+
                 }
 
             })
@@ -120,14 +126,13 @@ function SalaryData() {
             .post("api/uploadsalary", { excelData })
             .then((res) => {
                 setSalaryData(res.data.data);
-                console.log(res.data.data);
 
             })
             .catch((error) => console.error(`Error:${error}`));
 
     }
 
-    function getData(){
+    function getData() {
         http.get('api/datasalary', {
             params: {
                 nik: niktxt
@@ -141,7 +146,6 @@ function SalaryData() {
         e.preventDefault();
         getData()
 
-       
     }
     return (
 
@@ -207,6 +211,7 @@ function SalaryData() {
                                                     data-backdrop="static"
                                                     data-keyboard="false"
                                                     className="btn btn-info"
+                                                    onClick={() => clearForm()}
                                                     data-toggle="modal"
                                                     data-target="#modal-tambah">Tambah</button>
 
@@ -233,7 +238,7 @@ function SalaryData() {
                                                                         <i className="fas fa-search" />
                                                                     </button>
                                                                 </div>
-                                                           </div>
+                                                            </div>
 
                                                         </div>
                                                     </div>
@@ -260,7 +265,7 @@ function SalaryData() {
                                                                             <td>{item.last_month_pay}</td>
                                                                             <td>
 
-                                                                                <button type="button" onClick={()=>displayData(item.nik)} data-toggle="modal" data-target="#modal-tambah" className="btn-sm btn-primary">Edit</button>
+                                                                                <button type="button" onClick={() => displayData(item.nik)} data-toggle="modal" data-target="#modal-tambah" className="btn-sm btn-primary">Edit</button>
                                                                                 <button type="button" style={{ marginLeft: "5px" }} className="btn-sm btn-danger">Hapus</button>
 
                                                                             </td>
@@ -324,7 +329,6 @@ function SalaryData() {
             </div>
 
 
-
             <div className="modal fade" id="modal-tambah">
                 <div className="modal-dialog modal-lg">
                     <div className="modal-content">
@@ -351,8 +355,9 @@ function SalaryData() {
                                         className="input-group input-group-md"
                                         onSubmit={ChecNik}>
 
-                                            
+
                                         <input
+                                            ref={nikRef}
                                             type="text"
                                             value={niknew}
                                             onChange={(e) => setNiknew(e.target.value)}
@@ -377,7 +382,7 @@ function SalaryData() {
                                     />
                                 </div>
                             </div>
-<br/>
+                            <br />
                             <form onSubmit={addNew} autoComplete="off">
                                 <div className="row">
                                     <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -398,9 +403,9 @@ function SalaryData() {
                                             />
                                         </div>
 
-                                        
-                             
-                                        
+
+
+
                                         <div className="form-group">
                                             <label htmlFor="password">Gaji Bulan</label>
                                             <NumberFormat placeholder='yyyyMM'

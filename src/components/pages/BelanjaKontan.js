@@ -8,12 +8,16 @@ import { AuthContext } from '../../App';
 
 function BelanjaKontan() {
     const [oneDate, setOneDate] = useState(new Date());
-    const [amount, setAmount] = useState();
+    const [amount, setAmount] = useState("");
     const { http, toasts } = AuthUser();
     const { state } = useContext(AuthContext);
 
    async function save(e) {
         e.preventDefault();
+        if(amount===""){
+            toasts("error", "Silahkan Input Jumlah Belanja anda!");
+            return
+        }
         await http
             .post("api/saveblgkontan", {
                 nik:state.nik,

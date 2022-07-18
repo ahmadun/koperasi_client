@@ -85,7 +85,7 @@ function KasbonEntry() {
           setKredit(res.data.data[0].kredit_percen);
           notaRef.current.focus();
           setNikalock(true);
-          setSavelock(true);
+          setSavelock(false);
         } else {
           clearScreen();
           toasts("error", "Data Gaji Karyawan belum didaftarkan !");
@@ -134,7 +134,7 @@ function KasbonEntry() {
     const checkEmptyInput = !Object.values(formAddtwo).every(res => res === "")
     if (checkEmptyInput) {
      
-      if (formAddtwo.item != "" && formAddtwo.price != 0 && formAddtwo.qty > 0) {
+      if (formAddtwo.item != "" && formAddtwo.price != 0 && formAddtwo.qty > 0 && notaitem!="") {
 
         if(tableData.length>0){
           setTableData(tableData.filter((tableData) => tableData.form === 2));

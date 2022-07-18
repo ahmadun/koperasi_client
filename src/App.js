@@ -1,22 +1,4 @@
 
-// import { createContext, useState } from "react";
-// import Views from "./Views";
-// export const UserContext = createContext();
-
-// const App = () => {
-//   const [user, setUser] = useState({ loggedIn: false });
-//   return (
-//     <UserContext.Provider value={{ user, setUser}}>
-//         <Views/>
-//     </UserContext.Provider>
-//   );
-// }
-
-// export default App
-
-
-
-
 import React, { useReducer, createContext } from 'react';
 import Views from "./Views";
 
@@ -26,7 +8,9 @@ export const AuthContext = createContext()
 const initialState = {
   isAuthenticated: false,
   token: null,
-  nik:null
+  nik:null,
+  name:null,
+  role:null,
 }
 
 
@@ -40,6 +24,7 @@ const reducer = (state, action) => {
         token: action.payload.token,
         nik:action.payload.nik,
         name:action.payload.name,
+        role:action.payload.role,
       }
     case "LOGOUT":
       return {

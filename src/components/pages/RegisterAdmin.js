@@ -7,12 +7,14 @@ function RegisterAdmin() {
   const { http, toasts, user } = AuthUser();
   const [nik, setNik] = useState("");
   const [name, setName] = useState("");
+  const [rule, setRule] = useState("0");
   const [no_hp, setNo_hp] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [password_confirm, setPassword_confirm] = useState("");
   const [statususer, setStatususer] = useState();
   const nohpRef = useRef(null);
+  const nikRef = useRef(null);
 
 
 
@@ -32,6 +34,7 @@ function RegisterAdmin() {
           nohpRef.current.focus();
         } else {
           setStatususer(3);
+          setRule(res.data.user[0].role);
           setNo_hp(res.data.user[0].no_hp);
           setEmail(res.data.user[0].email);
         }
@@ -47,48 +50,80 @@ function RegisterAdmin() {
     }
   };
 
+  function clearScreen(){
+    setNik("")
+    setName("")
+    setNo_hp("")
+    setEmail("")
+    setPassword("")
+    setPassword_confirm("");
+    setStatususer(0)
+    setRule("0")
+    nikRef.current.focus();
+    
+  }
+
   async function SaveUser() {
+    if(rule==="0"){
+      return
+    }
     await http
       .post("api/auth/register", {
         nik: nik,
         name: name,
+        rule:rule,
         no_hp: no_hp,
         email: email,
         password: password,
+        role: 1,
       })
-      .then((res) => { toasts("succes", "Data Berhasil Tersimpan !") })
-      .catch((error) => console.error(`Error:${error}`));
+      .then((res) => { 
+        toasts("succes", "Data Berhasil Tersimpan !")
+       })
+      .catch((error) => 
+      toasts("error", "Data Gagal Tersimpan !")
+      );
   }
 
   async function UpdateUser() {
     await http
-      .post("/auth/updateuser", {
+      .post("api/auth/updateuser", {
         nik: nik,
         name: name,
+        rule:rule,
         no_hp: no_hp,
         email: email,
         password: password,
       })
       .then((res) => {
-        console.log(res)
-
-        toasts("succes", "Data Berhasil Tersimpan !");
+        if(res.data.status===true){
+          toasts("succes", "Data Berhasil Tersimpan !");
+          clearScreen();
+          
+        }else{
+          toasts("error", "Data Gagal Tersimpan !")
+        }
+        
       })
       .catch((error) => console.error(`Error:${error}`));
   }
 
   async function UpdateEmail() {
+    console.log(rule);
     await http
-      .post("/auth/updateemail", {
+      .post("api/auth/updateemail", {
         nik: nik,
+        rule:rule,
         no_hp: no_hp,
         email: email,
       })
       .then((res) => {
-        console.log(res)
+        clearScreen()
         toasts("succes", "Data Berhasil Tersimpan !");
       })
-      .catch((error) => console.error(`Error:${error}`));
+      .catch((error) => {
+        toasts("error", "Data Gagal Tersimpan !")
+      });
   }
 
   const InfoRegistrasi = () => {
@@ -180,6 +215,7 @@ function RegisterAdmin() {
                           onSubmit={ChecNik}
                         >
                           <input autoComplete="off"
+                            ref={nikRef}
                             type="text"
                             value={nik}
                             onChange={(e) => setNik(e.target.value)}
@@ -213,7 +249,20 @@ function RegisterAdmin() {
                       </div>
                     </div>
                     <div className="row">
-                      <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                      <div className="col-12">
+
+                      <div className="form-group">
+                    
+                      <label>Rule</label>
+                        <select className="form-control col-2" selected value={rule}
+                            onChange={(e) => setRule(e.target.value)}>
+                          <option value="0" disabled>Pilih Rule</option>
+                          <option value="2">Anggota</option>
+                          <option value="1">Karyawan</option>
+                        </select>
+                         
+                        </div>
+
                         <div className="form-group">
                           <label htmlFor="nohp">No HP</label>
                           <input
@@ -274,7 +323,7 @@ function RegisterAdmin() {
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
-              <h4 className="modal-title">Default Modal</h4>
+              <h4 className="modal-title">Ubah Informasi User</h4>
               <button
                 type="button"
                 className="close"
@@ -285,7 +334,7 @@ function RegisterAdmin() {
               </button>
             </div>
             <div className="modal-body">
-              <p>Hanya No Handphone dan alamat email yang ingin di ubah?</p>
+              <p>Hanya No Handphone, Rule dan alamat email yang ingin di ubah?</p>
             </div>
             <div className="modal-footer justify-content-between">
               <button
