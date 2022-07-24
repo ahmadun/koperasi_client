@@ -41,12 +41,12 @@ export default function AuthUser(){
 
     const http=axios.create({
 
-        baseURL: 'http://localhost:8000',
+        baseURL: 'http://127.0.0.1:5000',
         headers: {
-            'X-Requested-With': 'XMLHttpRequest',
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
-        },
-        withCredentials:true,
+        }
     });
 
 

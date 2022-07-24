@@ -22,7 +22,6 @@ function SimpananMain() {
 
     const sendEmail = () => {
 
-
         http.get('api/simpanan/mail',{
             params: {
                 nik: state.nik,
@@ -32,27 +31,24 @@ function SimpananMain() {
                     toasts("succes", "Data Berhasil Terkirim !");
                 }else{
                     toasts("error", "Data Gagal Tersimpan !");
-                }
-            
+                }           
     
             })
             .catch(error => console.error(`Error:${error}`));
        
     }
+
    
     const fetchSimpanan = () => {
         setLoad(true);
-        http.get('api/simpanan',{
-            params: {
-                nik: state.nik,
-            }})
-            .then((res) => {
+        http.get(`api/saving/220021`).then((res) => {
+            console.log(res)
                 const result = res.data;
                 setSimpananlists(result.data);
-                setWajib(result.total[0].wajib);
-                setPokok(result.total[0].pokok)
-                setSuka(result.total[0].sukarela);;
-                setTotals(result.total[0].totals);
+                setWajib(result.total[0].save_mand);
+                setPokok(result.total[0].save_main)
+                setSuka(result.total[0].save_volu);;
+                setTotals(result.total[0].save_mand+result.total[0].save_main+result.total[0].save_volu);
                 setLoad(false);
     
             })
@@ -136,9 +132,9 @@ function SimpananMain() {
 
                                                         simpananlists.map((item, i) => (
                                                             <tr key={i}>
-                                                                <td>{item.Tgl_penyimpanan}</td>
-                                                                <td><NumberFormat value={item.Simpanan_Wajib} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
-                                                                <td><NumberFormat value={item.Simpanan_Sukarela} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                                                                <td>{item.date_save}</td>
+                                                                <td><NumberFormat value={item.save_mand} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                                                                <td><NumberFormat value={item.save_volu} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                                                             </tr>
 
                                                         ))}

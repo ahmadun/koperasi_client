@@ -18,30 +18,26 @@ function Login() {
         
      e.preventDefault()
 
-     
-        http.get('/sanctum/csrf-cookie').then(response => {
-            http.post('api/auth/login',{
-                nik:nik,
-                password:password
-            }).then((res)=>{
-                if(res.data.isAuthenticated==true)
-                {
-                    dispatch({
-                        type: "LOGIN",
-                        payload: res.data
-                    })
-    
-                    setToken(res.data.nik,res.data.token);
-
-                }else{
-                    toasts("error", "User atau Password anda Salah !");
-                    
-                }
-               
-        
-                
+     http.post('api/login',{
+        nik:nik,
+        password:password
+    }
+    ).then((res)=>{
+        if(res.data.data.isAuthenticated=="true")
+        {
+            dispatch({
+                type: "LOGIN",
+                payload: res.data.data
             })
-        });
+
+            setToken(res.data.data.nik,res.data.data.token);
+
+        }else{
+            toasts("error", "User atau Password anda Salah !");
+            
+        }
+     })
+
       
  
     }

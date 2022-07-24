@@ -14,6 +14,8 @@ import ProtectedRoutes from "./ProtectedRoutes";
 import KasbonEntry from "./components/pages/KasbonEntry";
 import BelanjaKontan from "./components/pages/BelanjaKontan";
 import SalaryData from "./components/pages/SalaryData";
+import SavingsMaintenance from "./components/pages/SavingsMaintenance";
+import MasterSavings from "./components/pages/MasterSavings";
 
 const Views = () => {
   return (
@@ -42,6 +44,12 @@ const Views = () => {
         </Route>
         <Route exact path="/salarydata" element={<Layout />}>
           <Route index element={<SalaryData />} />
+        </Route>
+        <Route exact path="/savingmaintenance" element={<Layout />}>
+          <Route index element={<SavingsMaintenance />} />
+        </Route>
+        <Route exact path="/savingmaster" element={<Layout />}>
+          <Route index element={<MasterSavings />} />
         </Route>
       </Route>
     </Routes>

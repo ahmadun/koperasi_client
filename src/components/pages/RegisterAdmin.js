@@ -16,41 +16,20 @@ function RegisterAdmin() {
   const nohpRef = useRef(null);
   const nikRef = useRef(null);
 
+  const [niktxt, setNiktxt] = useState("");
+  const [member, setMember] = useState([]);
+  const [userinfo, setUserinfo] = useState({
+    nik: "",
+    name: "",
+    email: "",
+    no_hp: "",
+    password: ""
+  })
+  const [confirm_pass, setConfirm_pass] = useState("");
 
 
-  const ChecNik = (e) => {
-    e.preventDefault();
-    http
-      .get("api/checknama", {
-        params: {
-          nik: nik,
-        },
-      })
-      .then((res) => {
-        setName(res.data.data);
 
-        if (res.data.user.length == 0) {
-          setStatususer(1);
-          nohpRef.current.focus();
-        } else {
-          setStatususer(3);
-          setRule(res.data.user[0].role);
-          setNo_hp(res.data.user[0].no_hp);
-          setEmail(res.data.user[0].email);
-        }
-      })
-      .catch((error) => console.error(`Error:${error}`));
-  };
-
-  const RegisterData = () => {
-    if (statususer === 3) {
-      UpdateUser();
-    } else {
-      SaveUser();
-    }
-  };
-
-  function clearScreen(){
+  function clearScreen() {
     setNik("")
     setName("")
     setNo_hp("")
@@ -60,63 +39,68 @@ function RegisterAdmin() {
     setStatususer(0)
     setRule("0")
     nikRef.current.focus();
-    
+
   }
 
-  async function SaveUser() {
-    if(rule==="0"){
+  async function SaveUser(e) {
+    e.preventDefault()
+    if (rule === "0") {
       return
     }
     await http
-      .post("api/auth/register", {
+      .post("/api/users", {
         nik: nik,
         name: name,
-        rule:rule,
+        role: rule,
         no_hp: no_hp,
         email: email,
         password: password,
         role: 1,
+        created_by: 'Ahmadun',
       })
-      .then((res) => { 
+      .then((res) => {
         toasts("succes", "Data Berhasil Tersimpan !")
-       })
-      .catch((error) => 
-      toasts("error", "Data Gagal Tersimpan !")
+      })
+      .catch((error) =>
+        toasts("error", "Data Gagal Tersimpan !")
       );
   }
 
-  async function UpdateUser() {
-    await http
-      .post("api/auth/updateuser", {
-        nik: nik,
-        name: name,
-        rule:rule,
-        no_hp: no_hp,
-        email: email,
-        password: password,
-      })
-      .then((res) => {
-        if(res.data.status===true){
-          toasts("succes", "Data Berhasil Tersimpan !");
-          clearScreen();
-          
-        }else{
-          toasts("error", "Data Gagal Tersimpan !")
-        }
-        
-      })
-      .catch((error) => console.error(`Error:${error}`));
+
+
+
+  function getData(e) {
+    e.preventDefault()
+    http.get('/api/checkmember', {
+      params: {
+        nik: niktxt
+      }
+    }).then((res) => {
+      setMember(res.data)
+    }).catch(error => console.error(`Error:${error}`));
   }
 
-  async function UpdateEmail() {
-    console.log(rule);
-    await http
-      .post("api/auth/updateemail", {
-        nik: nik,
-        rule:rule,
-        no_hp: no_hp,
-        email: email,
-      })
+
+  const handleChangeUser = (e) => {
+
+    const newInput = (data) => ({ ...data, [e.target.name]: e.target.value })
+    setUserinfo(newInput)
+  }
+
+
+  const displayData = (nik) => {
+    const datanow = member.filter((newData) => newData.nik === nik);
+    datanow.map((item, i) => {
+      setUserinfo(item)
+    });
+  }
+
+  const updateUserinfo = (e) => {
+    e.preventDefault()
+    http
+      .put("/api/users",
+        userinfo
+      )
       .then((res) => {
         clearScreen()
         toasts("succes", "Data Berhasil Tersimpan !");
@@ -126,52 +110,21 @@ function RegisterAdmin() {
       });
   }
 
-  const InfoRegistrasi = () => {
-    if (statususer === 1) {
-      return <div className="alert alert-info">User Belum Terdaftar</div>;
-    } else if (statususer === 2) {
-      return (
-        <div className="alert alert-warning">
-          Karyawan Belum Menjadi Anggota
-        </div>
-      );
-    } else if (statususer === 3) {
-      return (
-        <div className="alert alert-success">
-          User telah terdaftar, data bisa dirubah
-        </div>
-      );
-    } else {
-      return <div></div>;
-    }
-  };
-
-  const ButtonType = () => {
-    if (statususer === 3 && password == "" && password_confirm == "") {
-      return (
-        <button
-          type="button"
-          className="btn btn-primary"
-          data-toggle="modal"
-          data-target="#modal-default"
-        >
-          Simpan
-        </button>
-      );
-    } else {
-      return (
-        <button
-          type="button"
-          onClick={() => RegisterData()}
-          className="btn btn-primary"
-        >
-          Simpan
-        </button>
-      );
-    }
-
+  const updateUserpwd = (e) => {
+    e.preventDefault()
+    console.log(userinfo)
+    http
+      .put("/api/users/pwd",
+        userinfo
+      )
+      .then((res) => {
+        clearScreen()
+        toasts("succes", "Data Berhasil Tersimpan !");
+      })
+      .catch((error) => {
+        toasts("error", "Data Gagal Tersimpan !")
+      });
   }
-
   return (
 
     <div className="content-wrapper">
@@ -204,154 +157,346 @@ function RegisterAdmin() {
                     Registrasi Anggota
                   </h3>
                 </div>
-                <div>
-                  <div className="card-body">
-                    <div className="row">
-                      <div className="col-sm-4">
-                        <label>NIK</label>
 
-                        <form
-                          className="input-group input-group-md"
-                          onSubmit={ChecNik}
-                        >
-                          <input autoComplete="off"
-                            ref={nikRef}
-                            type="text"
-                            value={nik}
-                            onChange={(e) => setNik(e.target.value)}
-                            className="form-control"
-                          />
-                          <span className="input-group-append">
-                            <button
-                              type="submit"
-                              className="btn btn-info btn-flat"
-                            >
-                              Check
-                            </button>
-                          </span>
-                        </form>
+
+                <div className="row">
+
+                  <div className="col-12">
+                    <ul className="nav nav-tabs" id="myTab" role="tablist">
+                      <li className="nav-item" role="presentation">
+                        <button className="nav-link active" id="home-tab" data-toggle="tab" data-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Registrasi</button>
+                      </li>
+                      <li className="nav-item" role="presentation">
+                        <button className="nav-link" id="profile-tab" data-toggle="tab" data-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Data User</button>
+                      </li>
+                    </ul>
+                    <div className="tab-content" id="myTabContent">
+                      <div className="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+
+
+                        <div className="row">
+
+
+                          <div className="card-body">
+
+
+                            <div className="row">
+                              <div className="col-sm-4">
+                                <label>NIK</label>
+
+                                <div
+                                  className="input-group input-group-md">
+                                  <input autoComplete="off"
+                                    ref={nikRef}
+                                    type="text"
+                                    value={nik}
+                                    onChange={(e) => setNik(e.target.value)}
+                                    className="form-control"
+                                  />
+
+                                </div>
+                              </div>
+
+                              <div className="col-sm-8">
+                                <label>Name</label>
+                                <input autoComplete="off"
+                                  type="text"
+                                  value={name}
+                                  onChange={(e) => setName(e.target.value)}
+                                  className="form-control"
+                                />
+                              </div>
+                            </div>
+                            <br></br>
+
+                            <div className="row">
+
+                              <div className="col-12">
+
+                                <form onSubmit={SaveUser}>
+
+                                <div className="form-group">
+
+                                  <label>Rule</label>
+                                  <select className="form-control col-2" selected value={rule}
+                                    onChange={(e) => setRule(e.target.value)}>
+                                    <option value="0" disabled>Pilih Rule</option>
+                                    <option value="2">Anggota</option>
+                                    <option value="1">Karyawan</option>
+                                  </select>
+
+                                </div>
+
+                                <div className="form-group">
+                                  <label htmlFor="nohp">No HP</label>
+                                  <input
+                                    type="text"
+                                    ref={nohpRef}
+                                    value={no_hp}
+                                    onChange={(e) => setNo_hp(e.target.value)}
+                                    className="form-control"
+                                    id="nohp"
+                                  />
+                                </div>
+                                <div className="form-group">
+                                  <label htmlFor="email">Email</label>
+                                  <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="form-control"
+
+                                  />
+                                </div>
+                                <div className="form-group">
+                                  <label htmlFor="password">Password</label>
+                                  <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="form-control"
+                                  />
+                                </div>
+                                <div className="form-group">
+                                  <label htmlFor="password_confirm">
+                                    Confirm Password
+                                  </label>
+                                  <input
+                                    type="password"
+                                    value={password_confirm}
+                                    onChange={(e) => setPassword_confirm(e.target.value)}
+                                    className="form-control"
+                                  />
+                                </div>
+
+                                <br></br>
+                                <div className="form-group">
+
+                                  
+                                  <button type="submit" className="btn btn-primary">Save</button>
+                                  
+
+                                </div>
+
+
+                                </form>
+                              </div>
+                            </div>
+                          </div>
+
+                        </div>
                       </div>
+                      <div className="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                        <div className="card-body">
 
-                      <div className="col-sm-8">
-                        <label>NAME</label>
-                        <input autoComplete="off"
-                          type="text"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          className="form-control"
-                        />
+                          <div className="row" style={{ marginBottom: "15px" }}>
+                            <div className="col-6">
+
+
+                              <div>
+                                <form onSubmit={getData}>
+                                  <div className="form-group row">
+                                    <label htmlFor="inputEmail3" className="col-sm-2 col-form-label">NIK</label>
+                                    <div className="col-3">
+                                      <input type="text" onChange={e => setNiktxt(e.target.value)} className="form-control" />
+                                    </div>
+
+                                    <div className="col-3">
+                                      <button type="submit" className="btn btn-primary">Show</button>
+                                    </div>
+                                  </div>
+                                </form>
+
+                              </div>
+
+
+                            </div>
+                            <div className="col-6 text-right">
+
+                              <button type="button" style={{ marginRight: "10px" }}
+                                data-backdrop="static"
+                                data-keyboard="false"
+                                className="btn btn-info"
+                                data-toggle="modal"
+                                data-target="#modal-tambah">Tambah</button>
+
+
+
+                            </div>
+                          </div>
+
+
+
+                          <div className="card">
+                            <div className="card-header">
+                              <h3 className="card-title"></h3>
+                              <div className="card-tools">
+                                <div className="input-group input-group-sm" style={{ width: 150 }}>
+                                  <input type="text" name="table_search" className="form-control float-right" placeholder="Search" />
+                                  <div className="input-group-append">
+                                    <button type="submit" className="btn btn-default">
+                                      <i className="fas fa-search" />
+                                    </button>
+                                  </div>
+                                </div>
+
+                              </div>
+                            </div>
+
+                            <div className="card-body table-responsive p-0">
+                              <table className="table table-hover text-nowrap">
+                                <thead>
+                                  <tr>
+                                    <th>NIK</th>
+                                    <th>Nama</th>
+                                    <th>No HP</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Aksi</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {
+                                    member.map((item, i) => (
+                                      <tr key={i}>
+                                        <td>{item.nik}</td>
+                                        <td>{item.name}</td>
+                                        <td>{item.no_hp}</td>
+                                        <td>{item.email}</td>
+                                        <td>{item.role}</td>
+                                        <td>
+
+                                          <button type="button" onClick={() => displayData(item.nik)} data-toggle="modal" data-target="#modal-edit" className="btn-sm btn-primary">Edit</button>
+                                          <button type="button" style={{ marginLeft: "5px" }} className="btn-sm btn-danger">Hapus</button>
+
+                                        </td>
+                                      </tr>
+
+                                    ))}
+
+                                </tbody>
+
+
+                              </table>
+                            </div>
+
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <br></br>
-                    <div className="row">
-                      <div className="col-lg-12">
-                        <InfoRegistrasi />
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="col-12">
 
-                      <div className="form-group">
-                    
-                      <label>Rule</label>
-                        <select className="form-control col-2" selected value={rule}
-                            onChange={(e) => setRule(e.target.value)}>
-                          <option value="0" disabled>Pilih Rule</option>
-                          <option value="2">Anggota</option>
-                          <option value="1">Karyawan</option>
-                        </select>
-                         
-                        </div>
-
-                        <div className="form-group">
-                          <label htmlFor="nohp">No HP</label>
-                          <input
-                            type="text"
-                            ref={nohpRef}
-                            value={no_hp}
-                            onChange={(e) => setNo_hp(e.target.value)}
-                            className="form-control"
-                            id="nohp"
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label htmlFor="email">EMAIL</label>
-                          <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="form-control"
-
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label htmlFor="password">Password</label>
-                          <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="form-control"
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label htmlFor="password_confirm">
-                            Confirm Password
-                          </label>
-                          <input
-                            type="password"
-                            value={password_confirm}
-                            onChange={(e) => setPassword_confirm(e.target.value)}
-                            className="form-control"
-                          />
-                        </div>
-
-                      </div>
-                    </div>
                   </div>
-                  <div className="card-footer">
-                    <ButtonType />
-                  </div>
+
                 </div>
               </div>
             </div>
-            <div className="col-md-6"></div>
           </div>
         </div>
       </section>
 
-      <div className="modal fade" id="modal-default">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h4 className="modal-title">Ubah Informasi User</h4>
-              <button
-                type="button"
-                className="close"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">×</span>
-              </button>
-            </div>
-            <div className="modal-body">
-              <p>Hanya No Handphone, Rule dan alamat email yang ingin di ubah?</p>
-            </div>
-            <div className="modal-footer justify-content-between">
-              <button
-                type="button"
-                className="btn btn-default"
-                data-dismiss="modal"
-              >
-                Close
-              </button>
-              <button type="button" onClick={() => UpdateEmail()} className="btn btn-primary">
-                Save
-              </button>
+
+
+      <div>
+        <div className="modal fade" id="modal-edit">
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h4 className="modal-title">Edit Data User</h4>
+              </div>
+              <div className="modal-body">
+
+
+
+                <div className="row">
+
+                  <div className="col-12">
+                    <ul className="nav nav-tabs" id="myTab" role="tablist">
+                      <li className="nav-item" role="presentation">
+                        <button className="nav-link active" id="home-tab" data-toggle="tab" data-target="#user-info" type="button" role="tab" aria-controls="home" aria-selected="true">Registrasi</button>
+                      </li>
+                      <li className="nav-item" role="presentation">
+                        <button className="nav-link" id="profile-tab" data-toggle="tab" data-target="#user-pwd" type="button" role="tab" aria-controls="profile" aria-selected="false">Data User</button>
+                      </li>
+                    </ul>
+                    <div className="tab-content" id="myTabContent">
+                      <div className="tab-pane fade show active" id="user-info" role="tabpanel" aria-labelledby="home-tab">
+
+
+                        <form onSubmit={updateUserinfo}>
+                          <div className="card-body">
+                            <div className="form-group">
+                              <label>NIK</label>
+                              <input type="text" readOnly value={userinfo.nik} onChange={handleChangeUser} className="form-control" />
+                            </div>
+                            <div className="form-group">
+                              <label>Name</label>
+                              <input type="text" name="name" value={userinfo.name} onChange={handleChangeUser} className="form-control" />
+                            </div>
+
+                            <div className="form-group">
+                              <label>Email</label>
+                              <input type="text" name="email" value={userinfo.email} onChange={handleChangeUser} className="form-control" />
+                            </div>
+
+                            <div className="form-group">
+                              <label>No HP</label>
+                              <input type="text" name="no_hp" value={userinfo.no_hp} onChange={handleChangeUser} className="form-control" />
+                            </div>
+
+
+                          </div>
+                          <div className="card-footer">
+                            <button type="submit" className="btn btn-primary">Save</button>
+                          </div>
+                        </form>
+
+
+                      </div>
+                      <div className="tab-pane fade" id="user-pwd" role="tabpanel" aria-labelledby="home-tab">
+
+                        <form onSubmit={updateUserpwd}>
+                          <div className="card-body">
+                            <div className="form-group">
+                              <label>NIK</label>
+                              <input type="text" readOnly value={userinfo.nik} className="form-control" />
+                            </div>
+                            <div className="form-group">
+                              <label>Name</label>
+                              <input type="text" readOnly name="name" value={userinfo.name} className="form-control" />
+                            </div>
+
+                            <div className="form-group">
+                              <label>Password</label>
+                              <input type="password" name="password" value={userinfo.password} onChange={handleChangeUser} className="form-control" />
+                            </div>
+
+                            <div className="form-group">
+                              <label>Confirm Password</label>
+                              <input type="password" name="password-conf" value={confirm_pass} onChange={(e) => setConfirm_pass(e.target.value)} className="form-control" />
+                            </div>
+
+
+                          </div>
+                          <div className="card-footer">
+                            <button type="submit" className="btn btn-primary">Save</button>
+                          </div>
+                        </form>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
     </div>
+
   );
 }
 

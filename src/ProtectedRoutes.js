@@ -17,10 +17,13 @@ const ProtectedRoutes = () => {
 
     if(!state.isAuthenticated){
 
-        http.get('/api/user').then(response => {
+      
+
+        http.get('/api/protected').then(response => {
         dispatch({
+      
           type: "LOGIN",
-          payload: response.data
+          payload: response.data.data
       })
   
       })

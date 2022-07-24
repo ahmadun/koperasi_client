@@ -38,10 +38,12 @@ function SalaryData() {
         setName('');
     }
 
+    
     const clearForm = () => {
+        seSts(false);
         nikRef.current.focus();
         clearScreen()
-      
+
     }
 
     const displayData = (nik) => {
@@ -61,13 +63,14 @@ function SalaryData() {
     const ChecNik = (e) => {
         e.preventDefault();
         http
-            .get("api/checknama", {
+            .get("/api/checkmember", {
                 params: {
                     nik: niknew,
                 },
             })
             .then((res) => {
-                setName(res.data.data);
+                console.log(res)
+                setName(res.data[0].name);
                 inputRef.current.focus();
 
             })
@@ -77,8 +80,8 @@ function SalaryData() {
     const addNew = async (e) => {
         e.preventDefault();
         newData.nik = niknew;
-        newData.basic_salary = basic.replace(',', '');
-        newData.last_salary = last.replace(',', '');
+        newData.basic_salary = basic;
+        newData.last_salary = last;
         newData.last_month_pay = month;
         newData.created_by = state.nik
         if (sts) {
@@ -88,9 +91,9 @@ function SalaryData() {
         }
 
         await http
-            .post("api/addnew", newData)
+            .post("/api/salarys", newData)
             .then((res) => {
-                if (res.data.status == true) {
+                if (res.data.data == true) {
                     toasts("succes", "Data Berhasil Tersimpan !");
                     clearScreen();
                     seSts(false);
@@ -123,7 +126,7 @@ function SalaryData() {
         e.preventDefault();
 
         await http
-            .post("api/uploadsalary", { excelData })
+            .post("/api/uploadsalary", excelData )
             .then((res) => {
                 setSalaryData(res.data.data);
 
@@ -133,12 +136,13 @@ function SalaryData() {
     }
 
     function getData() {
-        http.get('api/datasalary', {
+        http.get('/api/salarys', {
             params: {
                 nik: niktxt
             }
         }).then((res) => {
-            setSalaryData(res.data.data);
+            console.log(res)
+            setSalaryData(res.data);
         }).catch(error => console.error(`Error:${error}`));
     }
 

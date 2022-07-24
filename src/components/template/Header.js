@@ -10,7 +10,7 @@ function Header() {
     function logOut(){
 
        http
-        .post("api/auth/logout" )
+        .post("/api/logout" )
         .then((res) => {
             logout()
         })

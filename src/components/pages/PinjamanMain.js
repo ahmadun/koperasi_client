@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useContext } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import NumberFormat from 'react-number-format';
 import AuthUser from '../services/AuthUser'
 import Loading from '../template/Loading';
@@ -8,7 +8,7 @@ import { AuthContext } from '../../App';
 
 function PinjamanMain() {
     const { state } = useContext(AuthContext)
-    const { http,nik } = AuthUser();
+    const { http, nik } = AuthUser();
     const [pinjamanlists, setPinjamanlists] = useState([]);
     const [pinjamandetails, setPinjamandetails] = useState([]);
     const [totals, setTotals] = useState([]);
@@ -21,39 +21,26 @@ function PinjamanMain() {
 
 
     useEffect(() => {
-      
 
-        if(!state.isAuthenticated)
-        {
-            getnik().then(res=>{
-          
-               getListPinjaman(res.data.nik);
-
+        if (!state.isAuthenticated) {
+            getnik().then(res => {
+                getListPinjaman(res.data.data.nik);
             })
 
-        }else{
-
+        } else {
             getListPinjaman(state.nik);
-
         }
 
-   
-     
-   
     }, []);
 
 
-    const getnik=()=>{
-     
-       return http.get('/api/user')
+    const getnik = () => {
+
+        return http.get('/api/protected')
     }
 
     const getListPinjaman = (nik) => {
-        http.get('api/pinjaman',{
-            params: {
-                nik: nik,
-            }
-        }).then((res) => {
+        http.get(`api/credit_list/${nik}`).then((res) => {
             setPinjamanlists(res.data.data);
         }).catch(error => console.error(`Error:${error}`));
     }
@@ -66,15 +53,12 @@ function PinjamanMain() {
         setCodetypes(kode);
         if (kode == 'REG') {
             setTitleTable('Daftar Pinjaman Reguler');
-        } else {
+        } else if(kode=='KON'){
             setTitleTable('Daftar Pinjaman Konsumptif');
+        }else{
+            setTitleTable('Daftar Pinjaman PRT');
         }
-        http.get('api/pinjaman/detail', {
-            params: {
-                nik: state.nik,
-                code: kode
-            }
-        }).then((res) => {
+        http.get(`api/detail_credit?nik=${state.nik}&code=${kode}`).then((res) => {
             setLoad(false);
             setPinjamandetails(res.data.data);
             setTotals(res.data.total);
@@ -98,22 +82,22 @@ function PinjamanMain() {
                     <tr>
                         <td colSpan={5} align={'center'}><Loading /></td>
                     </tr> :
-                        pinjamandetails.map((item, i) => (
+                    pinjamandetails.map((item, i) => (
                         <tr key={i}>
-                            <td>{item.Bulan}</td>
-                            <td><NumberFormat value={item.Cicilan_pokok} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
-                            <td><NumberFormat value={item.Cicilan_bunga} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
-                            <td><NumberFormat value={item.Cicilan_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                            <td>{item.month}</td>
+                            <td><NumberFormat value={item.credit_main} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                            <td><NumberFormat value={item.credit_interest} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                            <td><NumberFormat value={item.credit_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                             <td>{item.remarks}</td>
                         </tr>
                     ))}
 
                 {totals.map((item, i) => (
                     <tr key={i} style={{ backgroundColor: 'pink', fontWeight: 'bolder' }}>
-                        <td><b>Total</b>   {item.Bulan} Bulan</td>
-                        <td><NumberFormat value={item.Cicilan_pokok} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
-                        <td><NumberFormat value={item.Cicilan_bunga} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
-                        <td><NumberFormat value={item.Cicilan_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                        <td><b>Total</b>   {item.month} Bulan</td>
+                        <td><NumberFormat value={item.credit_main} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                        <td><NumberFormat value={item.credit_interest} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                        <td><NumberFormat value={item.credit_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                         <td></td>
                     </tr>
                 ))}
@@ -128,8 +112,6 @@ function PinjamanMain() {
                     <th>Cicilan</th>
                     <th>Bunga</th>
                     <th>Kredit</th>
-                    <th>Kredit PRT</th>
-                    <th>Kode</th>
                 </tr>
             </thead>
             <tbody>
@@ -139,23 +121,56 @@ function PinjamanMain() {
                     </tr> :
                     pinjamandetails.map((item, i) => (
                         <tr key={i}>
-                            <td>{item.Bulan}</td>
-                            <td><NumberFormat value={item.Cicilan} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
-                            <td><NumberFormat value={item.Bunga} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
-                            <td><NumberFormat value={item.kredit_Kendaraan} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
-                            <td><NumberFormat value={item.Kredit_PRT} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
-                            <td>{item.Kode}</td>
+                            <td>{item.month}</td>
+                            <td><NumberFormat value={item.credit_main} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                            <td><NumberFormat value={item.credit_interest} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                            <td><NumberFormat value={item.credit_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                         </tr>
 
                     ))}
 
                 {totals.map((item, i) => (
                     <tr key={i} style={{ backgroundColor: 'pink', fontWeight: 'bolder' }}>
-                        <td><b>Total</b>   {item.Bulan} Bulan</td>
-                        <td><NumberFormat value={item.Cicilan_pokok} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
-                        <td><NumberFormat value={item.Cicilan_bunga} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
-                        <td><NumberFormat value={item.Cicilan_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
-                        <td><NumberFormat value={item.Kredit_PRT} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                        <td><b>Total</b>   {item.month} Bulan</td>
+                        <td><NumberFormat value={item.credit_main} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                        <td><NumberFormat value={item.credit_interest} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                        <td><NumberFormat value={item.credit_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                    </tr>
+                ))}
+
+            </tbody>
+        </table>
+
+    }
+
+
+    const CompTabePrt = () => {
+        return <table className="table table-head-fixed text-nowrap">
+            <thead>
+                <tr>
+                    <th>Bulan</th>
+                    <th>Kredit</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {load ?
+                    <tr>
+                        <td colSpan={6} align={'center'}><Loading /></td>
+                    </tr> :
+                    pinjamandetails.map((item, i) => (
+                        <tr key={i}>
+                            <td>{item.month}</td>
+                            <td><NumberFormat value={item.credit} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                            <td>{item.remarks} </td>
+                        </tr>
+
+                    ))}
+
+                {totals.map((item, i) => (
+                    <tr key={i} style={{ backgroundColor: 'pink', fontWeight: 'bolder' }}>
+                        <td><b>Total</b>   {item.month} Bulan</td>
+                        <td><NumberFormat value={item.credit} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>                     
                         <td></td>
                     </tr>
                 ))}
@@ -164,6 +179,8 @@ function PinjamanMain() {
         </table>
 
     }
+
+
 
     return (
         <div>
@@ -187,37 +204,30 @@ function PinjamanMain() {
                     <div className="container-fluid">
                         <div className="row">
                             <div className="col-12">
-                                <div className="card card-primary card-outline">
-                                    <div className="row">
-                                        <div className="col-12 table-responsive">
-                                            <table className="table table-striped">
 
-                                            </table>
+                                <div className="row">
+
+                                    {pinjamanlists.map((item, i) => (
+
+                                        <div className="col-md-3 col-sm-6 col-12 m-2" key={i}>
+                                            <div className="info-box">
+                                                <span className="info-box-icon bg-warning"><i className="far fa-credit-card" /></span>
+                                                <div className="info-box-content">
+                                                    <span className="info-box-text">{item.type}</span>
+                                                    <span className="info-box-number">{item.lastmonth}</span>
+                                                </div>
+                                                <a style={{cursor:'pointer'}} onClick={() => getDetailPinjaman(item.kode)} className="small-box-footer">
+                                                    Detail <i className="fas fa-arrow-circle-right"></i>
+                                                </a>
+                                            </div>
+
                                         </div>
-                                    </div><table className="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Jenis Kredit</th>
-                                                <th>Selesai</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {pinjamanlists.map((item, i) => (
-                                                <tr key={i}>
-                                                    <td>{item.type}</td>
-                                                    <td>{item.lastmonth}</td>
-                                                    <td>
-                                                        <button type="button" onClick={() => getDetailPinjaman(item.kode)} className="btn btn-info">Check</button>
-                                                    </td>
-                                                </tr>
 
-                                            ))}
-
-                                        </tbody>
-                                    </table>
-
+                                    ))}
                                 </div>
+
+
+
                             </div>
                         </div>
 
@@ -241,7 +251,12 @@ function PinjamanMain() {
                                             codetypes === 'REG' ? (
                                                 <CompTabelReguler />
                                             ) : (
-                                                <CompTabeKonsumtif />
+                                                codetypes==='KON' ? (
+                                                    <CompTabeKonsumtif />
+                                                ):(
+                                                    <CompTabePrt/>
+                                                )
+                                               
                                             )
 
                                         }
@@ -253,8 +268,6 @@ function PinjamanMain() {
                     </div>
 
                 </section>
-
-
 
             </div>
         </div>

@@ -118,7 +118,7 @@ function KasbonEntry() {
         formAddone.nik = nik;
         formAddone.date = oneDate;
         formAddone.user =state.nik
-        formAddone.price = formAddone.price.replace(',', '');
+        formAddone.price = formAddone.price.replaceAll(',', '');
         const newData = (data) => ([...data, formAddone])
         setTableData(newData);
         const emptyInput = { form: 1, nota: '', qty: 1, price: 0 }
@@ -144,7 +144,7 @@ function KasbonEntry() {
         formAddtwo.nota=notaitem;
         formAddtwo.user =state.nik
         formAddtwo.date = oneDate;
-        formAddtwo.price = formAddtwo.price.replace(',', '');     
+        formAddtwo.price = formAddtwo.price.replaceAll(',', '');     
         const newData = (data) => ([...data, formAddtwo])
         setTableData(newData);
         const emptyInput = { form: 2, item: '', qty: 1, price: 0 }

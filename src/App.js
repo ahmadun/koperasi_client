@@ -14,9 +14,14 @@ const initialState = {
 }
 
 
+
+
 const reducer = (state, action) => {
+
+
   switch (action.type) {
     case "LOGIN":
+
       return {
      
         ...state,
@@ -25,6 +30,7 @@ const reducer = (state, action) => {
         nik:action.payload.nik,
         name:action.payload.name,
         role:action.payload.role,
+        email:action.payload.email,
       }
     case "LOGOUT":
       return {
