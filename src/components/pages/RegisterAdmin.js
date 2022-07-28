@@ -313,12 +313,7 @@ function RegisterAdmin() {
                             </div>
                             <div className="col-6 text-right">
 
-                              <button type="button" style={{ marginRight: "10px" }}
-                                data-backdrop="static"
-                                data-keyboard="false"
-                                className="btn btn-info"
-                                data-toggle="modal"
-                                data-target="#modal-tambah">Tambah</button>
+                            
 
 
 
@@ -366,8 +361,7 @@ function RegisterAdmin() {
                                         <td>{item.role}</td>
                                         <td>
 
-                                          <button type="button" onClick={() => displayData(item.nik)} data-toggle="modal" data-target="#modal-edit" className="btn-sm btn-primary">Edit</button>
-                                          <button type="button" style={{ marginLeft: "5px" }} className="btn-sm btn-danger">Hapus</button>
+                                          <button type="button" onClick={() => displayData(item.nik)} data-toggle="modal" data-target="#modal-edit" className="btn-sm btn-primary"><span className="fa fa-edit"/></button>
 
                                         </td>
                                       </tr>

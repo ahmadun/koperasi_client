@@ -16,6 +16,7 @@ import BelanjaKontan from "./components/pages/BelanjaKontan";
 import SalaryData from "./components/pages/SalaryData";
 import SavingsMaintenance from "./components/pages/SavingsMaintenance";
 import MasterSavings from "./components/pages/MasterSavings";
+import CreditReguler from "./components/pages/CreditReguler";
 
 const Views = () => {
   return (
@@ -50,6 +51,9 @@ const Views = () => {
         </Route>
         <Route exact path="/savingmaster" element={<Layout />}>
           <Route index element={<MasterSavings />} />
+        </Route>
+        <Route exact path="/creditreg" element={<Layout />}>
+          <Route index element={<CreditReguler />} />
         </Route>
       </Route>
     </Routes>

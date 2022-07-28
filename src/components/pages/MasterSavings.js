@@ -74,6 +74,9 @@ function MasterSavings() {
 
 
 
+   
+
+
     const ChecNik = (e) => {
         e.preventDefault();
         http
@@ -100,7 +103,6 @@ function MasterSavings() {
         } else {
             newData.mode = 2;
         }
-        console.log(newData)
         await http
             .post("/api/savingmaster", newData)
             .then((res) => {
@@ -322,14 +324,7 @@ function MasterSavings() {
                                                                                 data-target="#modal-tambah"
                                                                                 className="btn-sm btn-primary"
                                                                             >
-                                                                                Edit
-                                                                            </button>
-                                                                            <button
-                                                                                type="button"
-                                                                                style={{ marginLeft: "5px" }}
-                                                                                className="btn-sm btn-danger"
-                                                                            >
-                                                                                Hapus
+                                                                                <span className="fa fa-edit"/>
                                                                             </button>
                                                                         </td>
                                                                     </tr>
@@ -461,9 +456,9 @@ function MasterSavings() {
                                     <div className="modal-footer justify-content-between">
                                         <button
                                             type="button"
-                                            className="btn btn-default"
+                                            className="btn btn-danger"
                                             data-dismiss="modal">
-                                            Close
+                                            Delete
                                         </button>
                                         <button type="submit" className="btn btn-primary">
                                             Simpan

@@ -17,8 +17,6 @@ function SimpananMain() {
     const [totals, setTotals] = useState(0);
     const [load,setLoad] = useState();
     const { state } = useContext(AuthContext)
-    
-
 
     const sendEmail = () => {
 
@@ -37,8 +35,7 @@ function SimpananMain() {
             .catch(error => console.error(`Error:${error}`));
        
     }
-
-   
+ 
     const fetchSimpanan = () => {
         setLoad(true);
         http.get(`api/saving/220021`).then((res) => {

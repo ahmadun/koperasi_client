@@ -311,9 +311,8 @@ function SalaryData() {
                         </div>
                         <div className="modal-body">
 
-                            <form onSubmit={handleSubmit}>
+                            <form>
                                 <input onChange={(e) => handleFile(e)} required type="file" />
-                                <button className="btn btn-primary" type="submit">Upload</button>
                             </form>
                         </div>
                         <div className="modal-footer justify-content-between">
@@ -324,7 +323,7 @@ function SalaryData() {
                             >
                                 Close
                             </button>
-                            <button type="button" className="btn btn-primary">
+                            <button type="button" onClick={handleSubmit} className="btn btn-primary">
                                 Save
                             </button>
                         </div>

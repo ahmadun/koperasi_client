@@ -6,8 +6,10 @@ import { AuthContext } from "../../App";
 import AuthUser from "../services/AuthUser";
 import DatePicker from "react-datepicker";
 import moment from 'moment';
+import { ExportToExcel } from "../services/ExportToExcel";
 
 function SavingsMaintenance() {
+    const fileName = "pinjaman-template"; 
     const { http, toasts } = AuthUser();
     const [excelData, setExcelData] = useState(null);
     const [data, setData] = useState([]);
@@ -32,6 +34,10 @@ function SavingsMaintenance() {
         created_by: ""
     });
 
+    const exceltemp = [
+        { 'nik': '', 'period': '', 'date_save': '','save_mand':'','save_main':'','save_volu':'' },
+      ];
+      
     
     useEffect(() => {
 
@@ -126,19 +132,34 @@ function SavingsMaintenance() {
         const file = e.target.files[0];
         const data = await file.arrayBuffer();
         const wobok = XLSX.read(data);
-
         const worksheetName = wobok.Sheets[wobok.SheetNames[0]];
         const dataex = XLSX.utils.sheet_to_json(worksheetName);
         setExcelData(dataex);
     };
 
-    const handleSubmit = async (e) => {
+    const handleKalkulasi = async (e) => {
         e.preventDefault();
-
+        const periods = moment.utc(period).format("yyyyMM")
         await http
-            .post("/api/uploadsalary", excelData)
+            .post("/api/createsaving", {month:periods,created_by:state.nik})
             .then((res) => {
-                setData(res.data.data);
+                if(res.data.data==true){
+                    toasts("succes", "Data Berhasil Tersimpan !");
+                }
+               
+            })
+            .catch((error) => console.error(`Error:${error}`));
+    };
+
+    const handleUpload = async (e) => {
+        e.preventDefault();
+        await http
+            .post("/api/savemainupload", excelData)
+            .then((res) => {
+                if(res.data.data==true){
+                    toasts("succes", "Data Berhasil Tersimpan !");
+                }
+               
             })
             .catch((error) => console.error(`Error:${error}`));
     };
@@ -146,6 +167,7 @@ function SavingsMaintenance() {
     function getData() {
         const periods = moment.utc(period).format("yyyyMM")
 
+        console.log(niktxt)
         http
             .get("/api/savingmain", {
                 params: {
@@ -154,7 +176,6 @@ function SavingsMaintenance() {
                 },
             })
             .then((res) => {
-                console.log(res);
                 setData(res.data);
             })
             .catch((error) => console.error(`Error:${error}`));
@@ -201,16 +222,13 @@ function SavingsMaintenance() {
 
                                                     <div className="form-group row">
                                                         <label
-                                                            htmlFor="inputEmail3"
-                                                            className="col-sm-2 col-form-label"
-                                                        >
+                                                            className="col-sm-2 col-form-label">
                                                             NIK
                                                         </label>
                                                         <div className="col-3">
                                                             <input
                                                                 type="text"
-                                                                className="form-control"
-                                                                id="inputEmail3"
+                                                                className="form-control" onChange={(e)=>setNiktxt(e.target.value)}
                                                             />
                                                         </div>
                                                     </div>
@@ -225,7 +243,7 @@ function SavingsMaintenance() {
                                                                 Period
                                                             </label>
                                                             <div className="col-3">
-                                                                <DatePicker className="form-control" isClearable showMonthYearPicker showFullMonthYearPicker showFourColumnMonthYearPicker dateFormat="MM/yyyy" selected={period} onChange={(date) => setPeriod(date)} name="date" />
+                                                                <DatePicker className="form-control" showMonthYearPicker showFullMonthYearPicker showFourColumnMonthYearPicker dateFormat="MM/yyyy" selected={period} onChange={(date) => setPeriod(date)} name="date" />
                                                             </div>
 
                                                             <div className="col-6">
@@ -236,7 +254,7 @@ function SavingsMaintenance() {
                                                                 </button>
 
                                                                 <button style={{ marginLeft: "10px", width: 200 }}
-                                                                    type="button" onClick={showtData}
+                                                                    type="button" onClick={handleKalkulasi}
                                                                     className="btn btn-info">
                                                                     Kalkulasi
                                                                 </button>
@@ -266,8 +284,7 @@ function SavingsMaintenance() {
                                                     data-keyboard="false"
                                                     className="btn btn-primary"
                                                     data-toggle="modal"
-                                                    data-target="#modal-default"
-                                                >
+                                                    data-target="#modal-default">
                                                     Upload
                                                 </button>
                                             </div>
@@ -351,15 +368,9 @@ function SavingsMaintenance() {
                                                                                 data-target="#modal-edit"
                                                                                 className="btn-sm btn-primary"
                                                                             >
-                                                                                Edit
+                                                                                <span className="fa fa-edit"></span>
                                                                             </button>
-                                                                            <button
-                                                                                type="button"
-                                                                                style={{ marginLeft: "5px" }}
-                                                                                className="btn-sm btn-danger"
-                                                                            >
-                                                                                Hapus
-                                                                            </button>
+                                                                           
                                                                         </td>
                                                                     </tr>
                                                                 ))}
@@ -383,7 +394,7 @@ function SavingsMaintenance() {
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h4 className="modal-title">Default Modal</h4>
+                            <h4 className="modal-title">Upload Data Penyesuaian</h4>
                             <button
                                 type="button"
                                 className="close"
@@ -395,22 +406,20 @@ function SavingsMaintenance() {
                         </div>
                         <div className="modal-body">
                             <form>
-                                <input required type="file" />
-                                <button className="btn btn-primary" type="submit">
-                                    Upload
-                                </button>
+                                <input onChange={(e) => handleFile(e)}  required type="file" />
+                               
                             </form>
                         </div>
                         <div className="modal-footer justify-content-between">
                             <button
                                 type="button"
                                 className="btn btn-default"
-                                data-dismiss="modal"
-                            >
+                                data-dismiss="modal">
                                 Close
                             </button>
-                            <button type="button" className="btn btn-primary">
-                                Save
+                            <ExportToExcel apiData={exceltemp} fileName={fileName} />
+                            <button type="button" className="btn btn-primary" onClick={handleUpload}>
+                                Upload
                             </button>
                         </div>
                     </div>
@@ -418,10 +427,10 @@ function SavingsMaintenance() {
             </div>
 
             <div className="modal fade" id="modal-tambah">
-                <div className="modal-dialog">
+                <div className="modal-dialog modal-lg">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h4 className="modal-title">Default Modal</h4>
+                            <h4 className="modal-title">Penyesuaian Tabungan</h4>
                             <button
                                 type="button"
                                 className="close"
@@ -432,17 +441,12 @@ function SavingsMaintenance() {
                             </button>
                         </div>
                         <div className="modal-body">
-
-
                             <div className="row">
                                 <div className="col-sm-4">
                                     <label>NIK</label>
-
                                     <form
                                         className="input-group input-group-md"
                                         onSubmit={ChecNik}>
-
-
                                         <input
                                             ref={nikRef}
                                             type="text"

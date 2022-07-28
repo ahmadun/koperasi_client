@@ -86,6 +86,16 @@ function Menu() {
                             </li>
 
 
+                            <li className="nav-item">
+                                <NavLink to="/creditreg" className="nav-link">
+                                    <i className="nav-icon far fa-edit" />
+                                    <p>
+                                        Pinjaman
+                                    </p>
+                                </NavLink>
+                            </li>
+
+
 
 
 
