@@ -247,7 +247,6 @@ function PinjamanMain() {
 
                                     <div className="card-body table-responsive p-0" style={{ height: 500 }}>
                                         {
-
                                             codetypes === 'REG' ? (
                                                 <CompTabelReguler />
                                             ) : (
@@ -255,8 +254,7 @@ function PinjamanMain() {
                                                     <CompTabeKonsumtif />
                                                 ):(
                                                     <CompTabePrt/>
-                                                )
-                                               
+                                                )                                             
                                             )
 
                                         }

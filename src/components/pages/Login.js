@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React, { useState,useContext  } from 'react'
+import React, { useState,useContext,useEffect } from 'react'
 import AuthUser from '../services/AuthUser'
 import { AuthContext } from '../../App';
 import { ToastContainer } from 'react-toastify';
@@ -12,7 +12,8 @@ function Login() {
     const [nik,setNik] = useState();
     const [password,setPassword] = useState();
 
-    
+
+
 
     async function postLogin(e){
         

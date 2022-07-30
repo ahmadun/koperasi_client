@@ -6,11 +6,7 @@ import { AuthContext } from '../../App';
 
 function Menu() {
 
-    // useEffect(() => {
-    //     const trees = window.$('[data-widget="treeview"]');
-    //     trees.Treeview('init');
-    // }, []);
-
+  
 
     const { state } = useContext(AuthContext)
 
@@ -23,8 +19,8 @@ function Menu() {
 
                 <div className="sidebar">
                     <nav className="mt-2">
-                        <ul className="nav nav-pills nav-sidebar flex-column"  data-widget="treeview" role="menu" data-accordion="false">
-                            <li className="nav-item has-treeview">
+                        <ul className="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                            <li className="nav-item">
                                 <NavLink to="/" className="nav-link">
                                     <i className="nav-icon fas fa-tachometer-alt" />
                                     <p>Dashboard</p>
@@ -90,7 +86,7 @@ function Menu() {
                                 <NavLink to="/creditreg" className="nav-link">
                                     <i className="nav-icon far fa-edit" />
                                     <p>
-                                        Pinjaman
+                                        Pinjaman Karyawan
                                     </p>
                                 </NavLink>
                             </li>

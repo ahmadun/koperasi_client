@@ -4,14 +4,19 @@ import DatePicker from "react-datepicker";
 import moment from 'moment';
 import NumberFormat from "react-number-format";
 import AuthUser from "../services/AuthUser";
+import Loading from "../template/Loading";
 
 const CreditReguler = () => {
 
     const { http, toasts } = AuthUser();
     const [data, setData] = useState([]);
+    const [datalist, setDatalist] = useState([]);
+    const [totals, setTotals] = useState([]);
+    const [konsum, setKonsum] = useState([]);
     const [start, setStart] = useState(new Date());
     const [newData, setNewData] = useState({
         nik: "",
+        code:"",
         credit_main: "",
         credit_interest: "",
         credit_total: "",
@@ -20,17 +25,36 @@ const CreditReguler = () => {
         created_by: ""
     });
 
+    const [lockons, setLockons] = useState(false);
+    const [creedittype, setCreedittype] = useState("");
+    const [nik, setNik] = useState("");
+    const [load, setLoad] = useState();
+    
     const options = [
         { value: '0', text: 'Pilih Remarks' },
         { value: '1', text: 'Angsuran' },
         { value: '2', text: 'Cicilan' }
     ];
 
+    const opt_type = [
+        { value: '', text: '' },
+        { value: 'REG', text: 'Reguler' },
+        { value: 'KON', text: 'Konsumptif' },
+        { value: 'PRT', text: 'PRT' }
+    ];
+
 
     const [selected, setSelected] = useState(options[0].value);
     const [desc, setDesc] = useState("");
+    const [seltype, setSeltype] = useState("");
 
 
+    function handleRadio(e){
+        setLockons(e.target.id=='kon'?false:true)
+        setCreedittype(e.target.id)
+       
+
+    }
 
     useEffect(() => {
 
@@ -41,6 +65,7 @@ const CreditReguler = () => {
 
             let x = {
                 'nik': newData.nik,
+                'code':newData.code,
                 'month': moment.utc(daterange).format("yyyyMM"),
                 "mand": newData.credit_main,
                 'interest': newData.credit_interest,
@@ -56,8 +81,23 @@ const CreditReguler = () => {
 
     }, [newData, desc, start]);
 
+    useEffect(() => {      
+        http.get(`/api/creditsmst`).then((res) => {
+            setKonsum(res.data);
+        }).catch(error => console.error(`Error:${error}`));
+    
+
+    }, []);
 
 
+    const handleShow=()=>{
+        http.get(`api/detail_credit?nik=${nik}&code=${seltype}`).then((res) => {
+            setLoad(false);
+            setDatalist(res.data.data);
+            setTotals(res.data.total);
+        }).catch(error => console.error(`Error:${error}`));
+
+    }
 
     const handleChange = (e) => {
         const newInput = (newData) => ({ ...newData, [e.target.name]: e.target.value });
@@ -69,16 +109,18 @@ const CreditReguler = () => {
 
         e.preventDefault();
         await http
-            .post("/api/processcredit", data)
+            .post(`/api/processcredit`, data,{
+                
+                params: {
+                    code: creedittype,
+                },
+            })
             .then((res) => {
                 if (res.data.data == true) {
                     toasts("succes", "Data Berhasil Tersimpan !");
                 }
-
             })
             .catch((error) => console.error(`Error:${error}`));
-
-
     };
 
 
@@ -86,11 +128,134 @@ const CreditReguler = () => {
     const ChangeOption = (e) => {
         setSelected(e.target.value);
         var index = e.nativeEvent.target.selectedIndex;
-
         setDesc(e.nativeEvent.target[index].text)
-
-
     };
+
+    const ChangeSel = (e) => {
+        setSeltype(e.target.value)
+        setDatalist([])
+        setTotals([])
+    };
+
+    const CompTabelReguler = () => {
+        return <table className="table table-head-fixed text-nowrap">
+            <thead>
+                <tr>
+                    <th>Bulan</th>
+                    <th>Cicilan Pokok</th>
+                    <th>Cicilan Bunga</th>
+                    <th>Cicilan Total</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {load ?
+                    <tr>
+                        <td colSpan={5} align={'center'}><Loading /></td>
+                    </tr> :
+                    datalist.map((item, i) => (
+                        <tr key={i}>
+                            <td>{item.month}</td>
+                            <td><NumberFormat value={item.credit_main} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                            <td><NumberFormat value={item.credit_interest} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                            <td><NumberFormat value={item.credit_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                            <td>{item.remarks}</td>
+                        </tr>
+                    ))}
+
+                {totals.map((item, i) => (
+                    <tr key={i} style={{ backgroundColor: 'pink', fontWeight: 'bolder' }}>
+                        <td><b>Total</b>   {item.month} Bulan</td>
+                        <td><NumberFormat value={item.credit_main} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                        <td><NumberFormat value={item.credit_interest} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                        <td><NumberFormat value={item.credit_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                        <td></td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    }
+    const CompTabeKonsumtif = () => {
+        return <table className="table table-head-fixed text-nowrap">
+            <thead>
+                <tr>
+                    <th>Bulan</th>
+                    <th>Cicilan</th>
+                    <th>Bunga</th>
+                    <th>Kredit</th>
+                    <th>Jenis Kredit</th>
+                    <th>Remark</th>
+                </tr>
+            </thead>
+            <tbody>
+                {load ?
+                    <tr>
+                        <td colSpan={6} align={'center'}><Loading /></td>
+                    </tr> :
+                    datalist.map((item, i) => (
+                        <tr key={i}>
+                            <td>{item.month}</td>
+                            <td><NumberFormat value={item.credit_main} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                            <td><NumberFormat value={item.credit_interest} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                            <td><NumberFormat value={item.credit_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                            <td>{item.remarks}</td>
+                            <td>{item.remarks}</td>
+                        </tr>
+
+                    ))}
+
+                {totals.map((item, i) => (
+                    <tr key={i} style={{ backgroundColor: 'pink', fontWeight: 'bolder' }}>
+                        <td><b>Total</b>   {item.month} Bulan</td>
+                        <td><NumberFormat value={item.credit_main} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                        <td><NumberFormat value={item.credit_interest} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                        <td><NumberFormat value={item.credit_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                ))}
+
+            </tbody>
+        </table>
+
+    }
+
+
+    const CompTabePrt = () => {
+        return <table className="table table-head-fixed text-nowrap">
+            <thead>
+                <tr>
+                    <th>Bulan</th>
+                    <th>Kredit</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {load ?
+                    <tr>
+                        <td colSpan={6} align={'center'}><Loading /></td>
+                    </tr> :
+                    datalist.map((item, i) => (
+                        <tr key={i}>
+                            <td>{item.month}</td>
+                            <td><NumberFormat value={item.credit} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                            <td>{item.remarks} </td>
+                        </tr>
+
+                    ))}
+
+                {totals.map((item, i) => (
+                    <tr key={i} style={{ backgroundColor: 'pink', fontWeight: 'bolder' }}>
+                        <td><b>Total</b>   {item.month} Bulan</td>
+                        <td><NumberFormat value={item.credit} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>                     
+                        <td></td>
+                    </tr>
+                ))}
+
+            </tbody>
+        </table>
+
+    }
 
 
     return (
@@ -100,7 +265,7 @@ const CreditReguler = () => {
                 <div className="container-fluid">
                     <div className="row mb-2">
                         <div className="col-sm-6">
-                            <h1>Registrasi</h1>
+                            <h1>Pinjaman</h1>
                         </div>
                         <div className="col-sm-6">
                             <ol className="breadcrumb float-sm-right">
@@ -121,7 +286,7 @@ const CreditReguler = () => {
                             <div className="card card-primary">
                                 <div className="card-header">
                                     <h3 className="card-title">
-                                        Registrasi Anggota
+                                        Data Pinjaman
                                     </h3>
                                 </div>
 
@@ -131,47 +296,65 @@ const CreditReguler = () => {
                                     <div className="col-12">
                                         <ul className="nav nav-tabs" id="myTab" role="tablist">
                                             <li className="nav-item" role="presentation">
-                                                <button className="nav-link active" id="home-tab" data-toggle="tab" data-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Registrasi</button>
+                                                <button className="nav-link active" id="home-tab" data-toggle="tab" data-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Input Pinjaman</button>
                                             </li>
                                             <li className="nav-item" role="presentation">
-                                                <button className="nav-link" id="profile-tab" data-toggle="tab" data-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Data User</button>
+                                                <button className="nav-link" id="profile-tab" data-toggle="tab" data-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Data Pinjaman</button>
                                             </li>
                                         </ul>
                                         <div className="tab-content" id="myTabContent">
                                             <div className="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                                                 <div className="row">
-
                                                     <div className="col-6">
-
                                                         <div className="card-body">
-
-
-
                                                             <form className="form-horizontal" onSubmit={handleProcess}>
                                                                 <div className="card-body">
 
                                                                     <div className="form-group row">
-                                                                        <label className="col-sm-4 col-form-label">Anggota</label>
+                                                                        <label className="col-sm-4 col-form-label">Jenis Pinjaman</label>
                                                                        
-                                                                        <div className="col-sm-4">
+                                                                        <div className="col-sm-3">
                                                                             <div className="custom-control custom-radio">
-                                                                                <input className="custom-control-input" type="radio" id="customRadio1" name="customRadio"/>
-                                                                                <label htmlFor="customRadio1" className="custom-control-label">Reguler</label>
+                                                                                <input className="custom-control-input" type="radio" id="reg" onChange={handleRadio} name="customRadio"/>
+                                                                                <label htmlFor="reg" className="custom-control-label">Reguler</label>
                                                                             </div>
                                                                         </div>
-                                                                        <div className="col-sm-4">
+                                                                        <div className="col-sm-3">
                                                                             <div className="custom-control custom-radio">
-                                                                                <input className="custom-control-input" type="radio" id="customRadio2" name="customRadio"/>
-                                                                                <label htmlFor="customRadio2" className="custom-control-label">Konsumptif</label>
+                                                                                <input className="custom-control-input" type="radio" id="kon" onChange={handleRadio} name="customRadio"/>
+                                                                                <label htmlFor="kon" className="custom-control-label">Konsumptif</label>
                                                                             </div>
                                                                         </div>
+
+                                                                        <div className="col-sm-2">
+                                                                            <div className="custom-control custom-radio">
+                                                                                <input className="custom-control-input" type="radio" id="prt" onChange={handleRadio} name="customRadio"/>
+                                                                                <label htmlFor="prt" className="custom-control-label">PRT</label>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="form-group row">
+                                                                        <label className="col-sm-4 col-form-label">Jenis Konsumptif</label>
+                                                                       
+                                                                        <div className="col-sm-8">
+                                                                            
+                                                                            <select disabled={lockons} className="form-control" value={newData.code} name="code" onChange={handleChange} required="required">
+                                                                            {konsum.map((item, i) => (
+                                                                                <option value={item.id}>{item.desc}</option>
+                                                                            ))}
+                                                                            </select>
+                                                                            
+                                                                           
+                                                                        </div>
+                                                                       
                                                                     </div>
 
 
                                                                     <div className="form-group row">
                                                                         <label className="col-sm-4 col-form-label">Anggota</label>
                                                                         <div className="col-sm-8">
-                                                                            <input type="text" name="nik" value={newData.nik} onChange={handleChange} className="form-control" />
+                                                                            <input type="text" autoComplete="off" name="nik" value={newData.nik} onChange={handleChange} className="form-control" />
 
                                                                         </div>
                                                                     </div>
@@ -202,8 +385,9 @@ const CreditReguler = () => {
                                                                             <DatePicker className="form-control" dateFormat="dd/MM/yyyy" selected={start} onChange={(date) => setStart(date)} name="date" />
                                                                         </div>
 
-                                                                    </div>
+                                                                    </div>                                      
 
+                                                        
                                                                     <div className="form-group row">
                                                                         <label className="col-sm-4 col-form-label">Bunga Perbulan</label>
                                                                         <div className="col-sm-8">
@@ -241,10 +425,6 @@ const CreditReguler = () => {
                                                                 </div>
 
                                                             </form>
-
-
-
-
                                                         </div>
 
                                                     </div>
@@ -326,20 +506,48 @@ const CreditReguler = () => {
 
 
                                                             <div>
-                                                                <form>
+                                                              
                                                                     <div className="form-group row">
-                                                                        <label htmlFor="inputEmail3" className="col-sm-2 col-form-label">NIK</label>
+                                                                        <label htmlFor="inputEmail3" className="col-sm-3 col-form-label">NIK</label>
                                                                         <div className="col-3">
-                                                                            <input type="text" className="form-control" />
+                                                                            <input type="text" value={nik} onChange={(e)=>setNik(e.target.value)} className="form-control" />
                                                                         </div>
 
-                                                                        <div className="col-3">
-                                                                            <button type="submit" className="btn btn-primary">Show</button>
-                                                                        </div>
                                                                     </div>
-                                                                </form>
 
-                                                            </div>
+                                                                    <div className="form-group row">
+                                                                        <label htmlFor="inputEmail3" className="col-sm-3 col-form-label">Jenis Pinjaman</label>
+                                                                        <div className="col-3">
+                                                                            
+                                                                            <select className="form-control" required="required" onChange={ChangeSel}>
+                                                                            {opt_type.map(option => (
+                                                                                <option key={option.value} value={option.value}>{option.text}</option>
+                                                                            ))}
+                                                                         
+                                                                            </select>
+                                                                            
+                                                                        </div>
+
+                                                                        <div className="checkbox">
+                                                                                <label>
+                                                                                    <input type="checkbox" value=""/> Aktif
+                                                                                </label>
+                                                                            </div>
+
+                                                                      
+                                                                    </div>
+
+                                                                    <div className="form-group row text-right">
+                                                                  
+                                                                        
+                                                                        <div className="col-6">
+                                                                            <button onClick={handleShow} className="btn btn-primary">Show</button>
+                                                                        </div>
+
+                                                                    </div>
+                                                                </div>
+
+                                                
 
 
                                                         </div>
@@ -370,22 +578,19 @@ const CreditReguler = () => {
                                                             </div>
                                                         </div>
 
-                                                        <div className="card-body table-responsive p-0">
-                                                            <table className="table table-hover text-nowrap">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>NIK</th>
-                                                                        <th>Nama</th>
-                                                                        <th>No HP</th>
-                                                                        <th>Email</th>
-                                                                        <th>Role</th>
-                                                                        <th>Aksi</th>
-                                                                    </tr>
-                                                                </thead>
+                                                        <div className="card-body table-responsive p-0" style={{ height: 500 }}>
+                                                            {
+                                                                seltype === 'REG' ? (
+                                                                    <CompTabelReguler />
+                                                                ) : (
+                                                                    seltype==='KON' ? (
+                                                                        <CompTabeKonsumtif />
+                                                                    ):(
+                                                                        <CompTabePrt/>
+                                                                    )                                             
+                                                                )
 
-
-
-                                                            </table>
+                                                            }
                                                         </div>
 
                                                     </div>

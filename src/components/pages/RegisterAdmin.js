@@ -229,7 +229,7 @@ function RegisterAdmin() {
 
                                 <div className="form-group">
                                   <label htmlFor="nohp">No HP</label>
-                                  <input
+                                  <input autoComplete="off"
                                     type="text"
                                     ref={nohpRef}
                                     value={no_hp}
@@ -240,7 +240,7 @@ function RegisterAdmin() {
                                 </div>
                                 <div className="form-group">
                                   <label htmlFor="email">Email</label>
-                                  <input
+                                  <input autoComplete="off"
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
@@ -250,7 +250,7 @@ function RegisterAdmin() {
                                 </div>
                                 <div className="form-group">
                                   <label htmlFor="password">Password</label>
-                                  <input
+                                  <input autoComplete="off"
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
@@ -261,7 +261,7 @@ function RegisterAdmin() {
                                   <label htmlFor="password_confirm">
                                     Confirm Password
                                   </label>
-                                  <input
+                                  <input autoComplete="off"
                                     type="password"
                                     value={password_confirm}
                                     onChange={(e) => setPassword_confirm(e.target.value)}
