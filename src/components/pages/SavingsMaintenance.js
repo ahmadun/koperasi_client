@@ -1,4 +1,4 @@
-import React, { useState, useRef, useContext,useEffect } from "react";
+import React, { useState, useRef, useContext, useEffect } from "react";
 import NumberFormat from "react-number-format";
 import { ToastContainer } from "react-toastify";
 import * as XLSX from "xlsx";
@@ -7,9 +7,10 @@ import AuthUser from "../services/AuthUser";
 import DatePicker from "react-datepicker";
 import moment from 'moment';
 import { ExportToExcel } from "../services/ExportToExcel";
+import ProgressLoad from "../template/Progress";
 
 function SavingsMaintenance() {
-    const fileName = "pinjaman-template"; 
+    const fileName = "pinjaman-template";
     const { http, toasts } = AuthUser();
     const [excelData, setExcelData] = useState(null);
     const [data, setData] = useState([]);
@@ -27,39 +28,40 @@ function SavingsMaintenance() {
     const [newData, setNewData] = useState({
         nik: "",
         date_save: period,
-        period:dateadd,
+        period: dateadd,
         save_main: 0,
         save_mand: 0,
         save_volu: "",
         created_by: ""
     });
 
+    const [load, setLoad] = useState();
     const exceltemp = [
-        { 'nik': '', 'period': '', 'date_save': '','save_mand':'','save_main':'','save_volu':'' },
-      ];
-      
-    
+        { 'nik': '', 'period': '', 'date_save': '', 'save_mand': '', 'save_main': '', 'save_volu': '' },
+    ];
+
+
     useEffect(() => {
 
-            setNewData({
-                nik: niktxt,
-                date_save: period,
-                period:dateadd,
-                save_main: 0,
-                save_mand: 0,
-                save_volu: 0,
-                created_by: state.nik
-            })
-             
-       
-      }, [adjust]);
+        setNewData({
+            nik: niktxt,
+            date_save: period,
+            period: dateadd,
+            save_main: 0,
+            save_mand: 0,
+            save_volu: 0,
+            created_by: state.nik
+        })
+
+
+    }, [adjust]);
 
     const clearForm = () => {
 
         setNewData({
             nik: "",
             date_save: period,
-            period:dateadd,
+            period: dateadd,
             save_main: 0,
             save_mand: 0,
             save_volu: "",
@@ -67,7 +69,7 @@ function SavingsMaintenance() {
         })
         setNameadd("")
         setNikadd("")
-       
+
     };
 
     const displayData = (nik) => {
@@ -99,19 +101,21 @@ function SavingsMaintenance() {
     const addNew = async (e) => {
         e.preventDefault();
 
-        if (adjust==false) {         
-            newData.save_volu=0-parseInt(newData.save_volu.replaceAll(',',''))           
-        }else{
-            newData.save_volu=parseInt(newData.save_volu.replaceAll(',',''))
+        setLoad(true)
+        if (adjust == false) {
+            newData.save_volu = 0 - parseInt(newData.save_volu.replaceAll(',', ''))
+        } else {
+            newData.save_volu = parseInt(newData.save_volu.replaceAll(',', ''))
         }
-        
-        newData.nik=nikadd
-        newData.date_save=moment.utc(dateadd).format("yyyy-MM-DD")
+
+        newData.nik = nikadd
+        newData.date_save = moment.utc(dateadd).format("yyyy-MM-DD")
         newData.period = moment.utc(periodadd).format("yyyyMM")
-        newData.created_by=state.nik
+        newData.created_by = state.nik
         await http
-            .post("/api/savingmain", newData) 
+            .post("/api/savingmain", newData)
             .then((res) => {
+                setLoad(false)
                 if (res.data.data == true) {
                     toasts("succes", "Data Berhasil Tersimpan !");
                     clearForm();
@@ -139,14 +143,16 @@ function SavingsMaintenance() {
 
     const handleKalkulasi = async (e) => {
         e.preventDefault();
+        setLoad(true)
         const periods = moment.utc(period).format("yyyyMM")
         await http
-            .post("/api/createsaving", {month:periods,created_by:state.nik})
+            .post("/api/createsaving", { month: periods, created_by: state.nik })
             .then((res) => {
-                if(res.data.data==true){
+                setLoad(false)
+                if (res.data.data == true) {
                     toasts("succes", "Data Berhasil Tersimpan !");
                 }
-               
+
             })
             .catch((error) => console.error(`Error:${error}`));
     };
@@ -156,10 +162,10 @@ function SavingsMaintenance() {
         await http
             .post("/api/savemainupload", excelData)
             .then((res) => {
-                if(res.data.data==true){
+                if (res.data.data == true) {
                     toasts("succes", "Data Berhasil Tersimpan !");
                 }
-               
+
             })
             .catch((error) => console.error(`Error:${error}`));
     };
@@ -228,7 +234,7 @@ function SavingsMaintenance() {
                                                         <div className="col-3">
                                                             <input
                                                                 type="text"
-                                                                className="form-control" onChange={(e)=>setNiktxt(e.target.value)}
+                                                                className="form-control" onChange={(e) => setNiktxt(e.target.value)}
                                                             />
                                                         </div>
                                                     </div>
@@ -253,11 +259,18 @@ function SavingsMaintenance() {
                                                                     Show
                                                                 </button>
 
-                                                                <button style={{ marginLeft: "10px", width: 200 }}
-                                                                    type="button" onClick={handleKalkulasi}
-                                                                    className="btn btn-info">
-                                                                    Kalkulasi
-                                                                </button>
+                                                                {load ? (
+
+                                                                    <ProgressLoad text="Kalkulasi" />
+                                                                ) : (
+                                                                    <button style={{ marginLeft: "10px", width: 200 }}
+                                                                        type="button" onClick={handleKalkulasi}
+                                                                        className="btn btn-info">
+                                                                        Kalkulasi
+                                                                    </button>
+                                                                )}
+
+
                                                             </div>
 
                                                         </div>
@@ -370,7 +383,7 @@ function SavingsMaintenance() {
                                                                             >
                                                                                 <span className="fa fa-edit"></span>
                                                                             </button>
-                                                                           
+
                                                                         </td>
                                                                     </tr>
                                                                 ))}
@@ -406,8 +419,8 @@ function SavingsMaintenance() {
                         </div>
                         <div className="modal-body">
                             <form>
-                                <input onChange={(e) => handleFile(e)}  required type="file" />
-                               
+                                <input onChange={(e) => handleFile(e)} required type="file" />
+
                             </form>
                         </div>
                         <div className="modal-footer justify-content-between">
@@ -477,38 +490,35 @@ function SavingsMaintenance() {
                             <form onSubmit={addNew} autoComplete="off">
                                 <div className="row">
                                     <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                                        
+
 
                                         <div className="form-group">
                                             <div className="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
                                                 <input type="checkbox" checked={adjust} onChange={e => setAdjust(e.target.checked)} className="custom-control-input" id="customSwitch3" />
-                                                <label className="custom-control-label" htmlFor="customSwitch3">{adjust ? ("Penyimpanan"):"Penarikan"}</label>
+                                                <label className="custom-control-label" htmlFor="customSwitch3">{adjust ? ("Penyimpanan") : "Penarikan"}</label>
                                             </div>
                                         </div>
 
                                         <div className="form-group">
-                                            <label htmlFor="nohp">Jumlah {adjust ?("Penyimpanan"):"Penarikan"}</label>
+                                            <label htmlFor="nohp">Jumlah {adjust ? ("Penyimpanan") : "Penarikan"}</label>
                                             <NumberFormat thousandSeparator={true} name="save_volu" value={newData.save_volu} onChange={handleChange}
-                                                className="form-control" 
+                                                className="form-control"
                                             />
                                         </div>
 
-                                 
-                                             <div className="form-group">
-                                             <label htmlFor="password">Tanggal {adjust ?("Penyimpanan"):"Penarikan"}</label>
-                                             <DatePicker className="form-control"  isClearable selected={dateadd} onChange={(date) => setDateadd(date)} name="date" />
-                                         </div>
+
+                                        <div className="form-group">
+                                            <label htmlFor="password">Tanggal {adjust ? ("Penyimpanan") : "Penarikan"}</label>
+                                            <DatePicker className="form-control" isClearable selected={dateadd} onChange={(date) => setDateadd(date)} name="date" />
+                                        </div>
 
 
-                                         <div className="form-group">
-                                             <label htmlFor="password">Periode</label>
-                                             <DatePicker className="form-control" showMonthYearPicker showFullMonthYearPicker showFourColumnMonthYearPicker isClearable dateFormat="MM/yyyy" selected={periodadd} onChange={(date) => setPeriodadd(date)} name="date" />
-                                         </div>
-                                            
-                                                                 
-
+                                        <div className="form-group">
+                                            <label htmlFor="password">Periode</label>
+                                            <DatePicker className="form-control" showMonthYearPicker showFullMonthYearPicker showFourColumnMonthYearPicker isClearable dateFormat="MM/yyyy" selected={periodadd} onChange={(date) => setPeriodadd(date)} name="date" />
+                                        </div>
                                     </div>
-                                   
+
                                 </div>
                             </form>
 
@@ -521,9 +531,16 @@ function SavingsMaintenance() {
                             >
                                 Close
                             </button>
-                            <button type="button" onClick={addNew} className="btn btn-primary">
-                                Simpan
-                            </button>
+
+                            {load ? (
+                                <ProgressLoad text="Simpan" />
+
+                            ) : (
+                                <button type="button" onClick={addNew} className="btn btn-primary">
+                                    Simpan
+                                </button>
+                            )}
+
                         </div>
                     </div>
                 </div>

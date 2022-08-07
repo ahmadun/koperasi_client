@@ -25,7 +25,7 @@ export default class Dashboard extends Component {
                                 <div className="col-lg-3 col-6">
                                     <div className="small-box bg-info">
                                         <div className="inner">
-                                            <h3>Rp. 150.000</h3>
+                                            <h3>Rp. -</h3>
                                             <p>TOTAL SHU 2022</p>
                                         </div>
                                         <div className="icon">

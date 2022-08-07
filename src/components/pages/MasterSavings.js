@@ -5,6 +5,7 @@ import * as XLSX from "xlsx";
 import { AuthContext } from "../../App";
 import AuthUser from "../services/AuthUser";
 import DatePicker from "react-datepicker";
+import ProgressLoad from "../template/Progress";
 
 function MasterSavings() {
     const { http, toasts } = AuthUser();
@@ -26,7 +27,7 @@ function MasterSavings() {
         mode: 1,
     });
 
-
+    const [load, setLoad] = useState();
     const [newDatas, setNewDatas] = useState({
         nik: "",
         save_main: 0,
@@ -37,8 +38,8 @@ function MasterSavings() {
     });
 
     function clearScreen() {
-    
-    
+
+
         setNikadd("")
         setNameadd("")
 
@@ -74,7 +75,7 @@ function MasterSavings() {
 
 
 
-   
+
 
 
     const ChecNik = (e) => {
@@ -95,6 +96,7 @@ function MasterSavings() {
 
     const addNew = async (e) => {
         e.preventDefault();
+        setLoad(true)
         newData.nik = nikadd
         newData.created_by = state.nik
 
@@ -106,12 +108,14 @@ function MasterSavings() {
         await http
             .post("/api/savingmaster", newData)
             .then((res) => {
+                setLoad(false)
                 if (res.data.data == true) {
                     toasts("succes", "Data Berhasil Tersimpan !");
                     clearScreen();
                     seSts(false);
                     getData();
                 } else {
+
                     if (res.data.data == 2627) {
                         toasts("error", "Data sudah ada!");
                     } else {
@@ -195,9 +199,12 @@ function MasterSavings() {
                                         <div className="row" style={{ marginBottom: "15px" }}>
                                             <div className="col-6">
                                                 <div>
+                                                    
+                                                    
+                                                    
                                                     <form onSubmit={getAllsalary}>
                                                         <div className="form-group row">
-                                                            <label className="col-sm-2 col-form-label">
+                                                            <label className="col-2 col-form-label">
                                                                 NIK
                                                             </label>
                                                             <div className="col-3">
@@ -324,7 +331,7 @@ function MasterSavings() {
                                                                                 data-target="#modal-tambah"
                                                                                 className="btn-sm btn-primary"
                                                                             >
-                                                                                <span className="fa fa-edit"/>
+                                                                                <span className="fa fa-edit" />
                                                                             </button>
                                                                         </td>
                                                                     </tr>
@@ -399,7 +406,7 @@ function MasterSavings() {
                                             type="text"
                                             value={nikadd}
                                             onChange={(e) => setNikadd(e.target.value)}
-                                            className="form-control"/>
+                                            className="form-control" />
                                         <span className="input-group-append">
                                             <button type="submit" className="btn btn-info btn-flat">
                                                 Check
@@ -430,7 +437,7 @@ function MasterSavings() {
                                                 getInputRef={inputRef}
                                                 name="save_main"
                                                 onChange={handleChange}
-                                                className="form-control"/>
+                                                className="form-control" />
                                         </div>
                                         <div className="form-group">
                                             <label>Simpanan Wajib</label>
@@ -450,19 +457,26 @@ function MasterSavings() {
                                                 value={newData.save_volu}
                                                 name="save_volu"
                                                 onChange={handleChange}
-                                                className="form-control"/>
+                                                className="form-control" />
                                         </div>
                                     </div>
                                     <div className="modal-footer justify-content-between">
-                                        <button
+                                        {/* <button
                                             type="button"
                                             className="btn btn-danger"
                                             data-dismiss="modal">
                                             Delete
-                                        </button>
-                                        <button type="submit" className="btn btn-primary">
-                                            Simpan
-                                        </button>
+                                        </button> */}
+                                        {load ? (
+                                            <ProgressLoad text="Simpan" />
+
+                                        ) : (
+                                            <button type="submit" className="btn btn-info">
+                                                Simpan
+                                            </button>
+                                        )}
+
+
                                     </div>
                                 </div>
                             </form>

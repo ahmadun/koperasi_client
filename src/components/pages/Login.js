@@ -1,46 +1,45 @@
 import axios from 'axios'
-import React, { useState,useContext,useEffect } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import AuthUser from '../services/AuthUser'
 import { AuthContext } from '../../App';
 import { ToastContainer } from 'react-toastify';
-
+import { NavLink } from 'react-router-dom'
 
 function Login() {
 
-    const {http,setToken,toasts} = AuthUser();
+    const { http, setToken, toasts } = AuthUser();
     const { dispatch } = useContext(AuthContext)
-    const [nik,setNik] = useState();
-    const [password,setPassword] = useState();
+    const [nik, setNik] = useState();
+    const [password, setPassword] = useState();
 
 
 
 
-    async function postLogin(e){
-        
-     e.preventDefault()
+    async function postLogin(e) {
 
-     http.post('api/login',{
-        nik:nik,
-        password:password
-    }
-    ).then((res)=>{
-        if(res.data.data.isAuthenticated=="true")
-        {
-            dispatch({
-                type: "LOGIN",
-                payload: res.data.data
-            })
+        e.preventDefault()
 
-            setToken(res.data.data.nik,res.data.data.token);
-
-        }else{
-            toasts("error", "User atau Password anda Salah !");
-            
+        http.post('api/login', {
+            nik: nik,
+            password: password
         }
-     })
+        ).then((res) => {
+            if (res.data.data.isAuthenticated == "true") {
+                dispatch({
+                    type: "LOGIN",
+                    payload: res.data.data
+                })
 
-      
- 
+                setToken(res.data.data.nik, res.data.data.token);
+
+            } else {
+                toasts("error", "User atau Password anda Salah !");
+
+            }
+        })
+
+
+
     }
 
 
@@ -56,7 +55,7 @@ function Login() {
                         <p className="login-box-msg">Silahkan Login</p>
                         <form onSubmit={postLogin}>
                             <div className="input-group mb-3">
-                                <input type="text" onChange={e=>setNik(e.target.value)} className="form-control" placeholder="NIK" />
+                                <input type="text" onChange={e => setNik(e.target.value)} className="form-control" placeholder="NIK" />
                                 <div className="input-group-append">
                                     <div className="input-group-text">
                                         <span className="fas fa-envelope" />
@@ -64,7 +63,7 @@ function Login() {
                                 </div>
                             </div>
                             <div className="input-group mb-3">
-                                <input type="password" onChange={e=>setPassword(e.target.value)} className="form-control" placeholder="Password" />
+                                <input type="password" onChange={e => setPassword(e.target.value)} className="form-control" placeholder="Password" />
                                 <div className="input-group-append">
                                     <div className="input-group-text">
                                         <span className="fas fa-lock" />
@@ -73,15 +72,20 @@ function Login() {
                             </div>
                             <div className="row">
                                 <div className="col-8">
-                              
+
                                 </div>
                                 <div className="col-4">
                                     <button type="submit" className="btn btn-primary btn-block">Sign In</button>
                                 </div>
                             </div>
                         </form>
-                       
-                
+
+                        <p className="mb-0">
+                            <NavLink to="/register" className="text-center">Pendaftaran Akun</NavLink>
+                        </p>
+
+
+
                     </div>
                 </div>
             </div></div>

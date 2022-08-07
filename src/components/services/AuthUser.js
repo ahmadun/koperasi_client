@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate  } from 'react-router-dom';
 import {  toast } from 'react-toastify';
 
 export default function AuthUser(){
@@ -32,16 +32,20 @@ export default function AuthUser(){
         setToken(token);
         setUser(user);
         navigate('/');
+        window.location.reload();
     }
 
     const logout = () => {
         sessionStorage.clear();
         navigate('/login');
+     
+
     }
 
     const http=axios.create({
 
-        baseURL: 'http://127.0.0.1:5000',
+        baseURL: 'http://156.67.219.145:5000',
+        // baseURL: 'http://localhost:5000',
         headers: {
             'Access-Control-Allow-Origin': '*',
             'Content-Type': 'application/json',

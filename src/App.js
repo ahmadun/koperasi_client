@@ -36,7 +36,8 @@ const reducer = (state, action) => {
       return {
         ...state,
         isAuthenticated: false,
-        nik:null
+        nik:null,
+        role:null,
       }
 
 
@@ -53,9 +54,7 @@ function App() {
 
   return (
   
-  <AuthContext.Provider value={{
-    state,
-    dispatch }}>
+  <AuthContext.Provider value={{state,dispatch }}>
       <Views/>
   </AuthContext.Provider>
 

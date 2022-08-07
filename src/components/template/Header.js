@@ -1,4 +1,5 @@
 import React, { Component,useContext } from 'react'
+import { NavLink } from 'react-router-dom';
 import { AuthContext } from '../../App'
 import AuthUser from '../services/AuthUser';
 
@@ -17,6 +18,14 @@ function Header() {
         .catch((error) => console.error(`Error:${error}`));
 
     }
+
+
+    function changepass(){
+
+       
+ 
+     }
+ 
     const { state } = useContext(AuthContext)
         return (
 
@@ -47,7 +56,10 @@ function Header() {
                                 </p>
                             </li>
 
+                            
+
                             <li className="user-footer">
+                                <NavLink to="/changepassword" className="btn btn-default btn-flat float-left">Ubah Password</NavLink>
                                 <a onClick={()=>logOut()} className="btn btn-default btn-flat float-right">Sign out</a>
                             </li>
                         </ul>

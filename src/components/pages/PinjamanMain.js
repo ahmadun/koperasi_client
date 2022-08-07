@@ -89,6 +89,7 @@ function PinjamanMain() {
                             <td><NumberFormat value={item.credit_interest} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                             <td><NumberFormat value={item.credit_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                             <td>{item.remarks}</td>
+                            
                         </tr>
                     ))}
 
@@ -112,6 +113,8 @@ function PinjamanMain() {
                     <th>Cicilan</th>
                     <th>Bunga</th>
                     <th>Kredit</th>
+                    <th>Jenis</th>
+                    <th>Remarks</th>
                 </tr>
             </thead>
             <tbody>
@@ -125,6 +128,8 @@ function PinjamanMain() {
                             <td><NumberFormat value={item.credit_main} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                             <td><NumberFormat value={item.credit_interest} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                             <td><NumberFormat value={item.credit_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                            <td>{item.desc}</td>
+                            <td>{item.remarks}</td>
                         </tr>
 
                     ))}
@@ -135,6 +140,10 @@ function PinjamanMain() {
                         <td><NumberFormat value={item.credit_main} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                         <td><NumberFormat value={item.credit_interest} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                         <td><NumberFormat value={item.credit_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                        <td></td>
+                        <td></td>
+
+                   
                     </tr>
                 ))}
 

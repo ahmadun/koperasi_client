@@ -5,6 +5,8 @@ import moment from 'moment';
 import NumberFormat from "react-number-format";
 import AuthUser from "../services/AuthUser";
 import Loading from "../template/Loading";
+import ProgressLoad from "../template/Progress";
+import { NavLink } from 'react-router-dom'
 
 const CreditReguler = () => {
 
@@ -14,9 +16,23 @@ const CreditReguler = () => {
     const [totals, setTotals] = useState([]);
     const [konsum, setKonsum] = useState([]);
     const [start, setStart] = useState(new Date());
+    const [sts, seSts] = useState(false);
     const [newData, setNewData] = useState({
         nik: "",
-        code:"",
+        code: "",
+        credit_main: "",
+        credit_interest: "",
+        credit_total: "",
+        tenor: 0,
+        remarks: "",
+        created_by: ""
+    });
+
+    const [editData, setEditData] = useState({
+        nik: "",
+        code: "",
+        month: "",
+        credit: "",
         credit_main: "",
         credit_interest: "",
         credit_total: "",
@@ -29,7 +45,7 @@ const CreditReguler = () => {
     const [creedittype, setCreedittype] = useState("");
     const [nik, setNik] = useState("");
     const [load, setLoad] = useState();
-    
+
     const options = [
         { value: '0', text: 'Pilih Remarks' },
         { value: '1', text: 'Angsuran' },
@@ -37,7 +53,6 @@ const CreditReguler = () => {
     ];
 
     const opt_type = [
-        { value: '', text: '' },
         { value: 'REG', text: 'Reguler' },
         { value: 'KON', text: 'Konsumptif' },
         { value: 'PRT', text: 'PRT' }
@@ -46,13 +61,13 @@ const CreditReguler = () => {
 
     const [selected, setSelected] = useState(options[0].value);
     const [desc, setDesc] = useState("");
-    const [seltype, setSeltype] = useState("");
+    const [seltype, setSeltype] = useState("REG");
 
 
-    function handleRadio(e){
-        setLockons(e.target.id=='kon'?false:true)
+    function handleRadio(e) {
+        setLockons(e.target.id == 'kon' ? false : true)
         setCreedittype(e.target.id)
-       
+
 
     }
 
@@ -65,7 +80,7 @@ const CreditReguler = () => {
 
             let x = {
                 'nik': newData.nik,
-                'code':newData.code,
+                'code': newData.code,
                 'month': moment.utc(daterange).format("yyyyMM"),
                 "mand": newData.credit_main,
                 'interest': newData.credit_interest,
@@ -81,16 +96,17 @@ const CreditReguler = () => {
 
     }, [newData, desc, start]);
 
-    useEffect(() => {      
+    useEffect(() => {
         http.get(`/api/creditsmst`).then((res) => {
             setKonsum(res.data);
         }).catch(error => console.error(`Error:${error}`));
-    
+
 
     }, []);
 
 
-    const handleShow=()=>{
+    const handleShow = () => {
+        setLoad(true);
         http.get(`api/detail_credit?nik=${nik}&code=${seltype}`).then((res) => {
             setLoad(false);
             setDatalist(res.data.data);
@@ -104,26 +120,55 @@ const CreditReguler = () => {
         setNewData(newInput);
     };
 
-    const handleProcess = async (e) => {
-        e.preventDefault()
+    const handleEdit = (e) => {
+        const newInput = (editData) => ({ ...editData, [e.target.name]: e.target.value.replaceAll(',', '') });
+        setEditData(newInput);
+    };
 
-        e.preventDefault();
+    const updateData = async (e) => {
+        e.preventDefault()
         await http
-            .post(`/api/processcredit`, data,{
-                
+            .put(`/api/updatecredit?code=${seltype}`, editData)
+            .then((res) => {
+                setLoad(false)
+                if (res.data.data == true) {
+                    toasts("succes", "Data Berhasil Tersimpan !");
+                    seSts(false);
+                } else {
+                    toasts("error", "Data Gagal Tersimpan !");
+                }
+            })
+            .catch((error) => console.error(`Error:${error}`));
+
+    };
+
+    const handleProcess = async (e) => {
+        e.preventDefault();
+        setLoad(true);
+        await http
+            .post(`/api/processcredit`, data, {
+
                 params: {
                     code: creedittype,
                 },
             })
             .then((res) => {
                 if (res.data.data == true) {
+                    setLoad(false);
                     toasts("succes", "Data Berhasil Tersimpan !");
                 }
             })
             .catch((error) => console.error(`Error:${error}`));
     };
 
-
+    const displayData = (month) => {
+        seSts(true);
+        const datanow = datalist.filter((datalist) => datalist.month === month);
+        datanow.map((item, i) => {
+            console.log(item)
+            setEditData(item)
+        });
+    };
 
     const ChangeOption = (e) => {
         setSelected(e.target.value);
@@ -146,6 +191,7 @@ const CreditReguler = () => {
                     <th>Cicilan Bunga</th>
                     <th>Cicilan Total</th>
                     <th>Remarks</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -160,6 +206,18 @@ const CreditReguler = () => {
                             <td><NumberFormat value={item.credit_interest} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                             <td><NumberFormat value={item.credit_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                             <td>{item.remarks}</td>
+                            <td>
+                                <button
+                                    type="button"
+                                    onClick={() => displayData(item.month)}
+                                    data-toggle="modal"
+                                    data-target="#modal-edit"
+                                    className="btn-sm btn-primary"
+                                >
+                                    <span className="fa fa-edit"></span>
+                                </button>
+
+                            </td>
                         </tr>
                     ))}
 
@@ -169,6 +227,7 @@ const CreditReguler = () => {
                         <td><NumberFormat value={item.credit_main} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                         <td><NumberFormat value={item.credit_interest} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                         <td><NumberFormat value={item.credit_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                        <td></td>
                         <td></td>
                     </tr>
                 ))}
@@ -185,6 +244,7 @@ const CreditReguler = () => {
                     <th>Kredit</th>
                     <th>Jenis Kredit</th>
                     <th>Remark</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -198,8 +258,20 @@ const CreditReguler = () => {
                             <td><NumberFormat value={item.credit_main} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                             <td><NumberFormat value={item.credit_interest} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                             <td><NumberFormat value={item.credit_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                            <td>{item.desc}</td>
                             <td>{item.remarks}</td>
-                            <td>{item.remarks}</td>
+                            <td>
+                                <button
+                                    type="button"
+                                    onClick={() => displayData(item.month)}
+                                    data-toggle="modal"
+                                    data-target="#modal-edit"
+                                    className="btn-sm btn-primary"
+                                >
+                                    <span className="fa fa-edit"></span>
+                                </button>
+
+                            </td>
                         </tr>
 
                     ))}
@@ -210,6 +282,7 @@ const CreditReguler = () => {
                         <td><NumberFormat value={item.credit_main} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                         <td><NumberFormat value={item.credit_interest} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                         <td><NumberFormat value={item.credit_total} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                        <td></td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -228,6 +301,7 @@ const CreditReguler = () => {
                     <th>Bulan</th>
                     <th>Kredit</th>
                     <th>Remarks</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -240,6 +314,19 @@ const CreditReguler = () => {
                             <td>{item.month}</td>
                             <td><NumberFormat value={item.credit} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
                             <td>{item.remarks} </td>
+                            <td>
+                                <button
+                                    type="button"
+                                    onClick={() => displayData(item.month)}
+                                    data-toggle="modal"
+                                    data-target="#modal-edit"
+                                    className="btn-sm btn-primary"
+                                >
+                                    <span className="fa fa-edit"></span>
+                                </button>
+
+                            </td>
+
                         </tr>
 
                     ))}
@@ -247,7 +334,8 @@ const CreditReguler = () => {
                 {totals.map((item, i) => (
                     <tr key={i} style={{ backgroundColor: 'pink', fontWeight: 'bolder' }}>
                         <td><b>Total</b>   {item.month} Bulan</td>
-                        <td><NumberFormat value={item.credit} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>                     
+                        <td><NumberFormat value={item.credit} displayType={'text'} thousandSeparator={true} prefix={'Rp'} /></td>
+                        <td></td>
                         <td></td>
                     </tr>
                 ))}
@@ -312,23 +400,23 @@ const CreditReguler = () => {
 
                                                                     <div className="form-group row">
                                                                         <label className="col-sm-4 col-form-label">Jenis Pinjaman</label>
-                                                                       
+
                                                                         <div className="col-sm-3">
                                                                             <div className="custom-control custom-radio">
-                                                                                <input className="custom-control-input" type="radio" id="reg" onChange={handleRadio} name="customRadio"/>
+                                                                                <input className="custom-control-input" type="radio" id="reg" onChange={handleRadio} name="customRadio" />
                                                                                 <label htmlFor="reg" className="custom-control-label">Reguler</label>
                                                                             </div>
                                                                         </div>
                                                                         <div className="col-sm-3">
                                                                             <div className="custom-control custom-radio">
-                                                                                <input className="custom-control-input" type="radio" id="kon" onChange={handleRadio} name="customRadio"/>
+                                                                                <input className="custom-control-input" type="radio" id="kon" onChange={handleRadio} name="customRadio" />
                                                                                 <label htmlFor="kon" className="custom-control-label">Konsumptif</label>
                                                                             </div>
                                                                         </div>
 
                                                                         <div className="col-sm-2">
                                                                             <div className="custom-control custom-radio">
-                                                                                <input className="custom-control-input" type="radio" id="prt" onChange={handleRadio} name="customRadio"/>
+                                                                                <input className="custom-control-input" type="radio" id="prt" onChange={handleRadio} name="customRadio" />
                                                                                 <label htmlFor="prt" className="custom-control-label">PRT</label>
                                                                             </div>
                                                                         </div>
@@ -336,18 +424,18 @@ const CreditReguler = () => {
 
                                                                     <div className="form-group row">
                                                                         <label className="col-sm-4 col-form-label">Jenis Konsumptif</label>
-                                                                       
+
                                                                         <div className="col-sm-8">
-                                                                            
+
                                                                             <select disabled={lockons} className="form-control" value={newData.code} name="code" onChange={handleChange} required="required">
-                                                                            {konsum.map((item, i) => (
-                                                                                <option value={item.id}>{item.desc}</option>
-                                                                            ))}
+                                                                                {konsum.map((item, i) => (
+                                                                                    <option key={item.id} value={item.id}>{item.desc}</option>
+                                                                                ))}
                                                                             </select>
-                                                                            
-                                                                           
+
+
                                                                         </div>
-                                                                       
+
                                                                     </div>
 
 
@@ -385,9 +473,9 @@ const CreditReguler = () => {
                                                                             <DatePicker className="form-control" dateFormat="dd/MM/yyyy" selected={start} onChange={(date) => setStart(date)} name="date" />
                                                                         </div>
 
-                                                                    </div>                                      
+                                                                    </div>
 
-                                                        
+
                                                                     <div className="form-group row">
                                                                         <label className="col-sm-4 col-form-label">Bunga Perbulan</label>
                                                                         <div className="col-sm-8">
@@ -414,7 +502,16 @@ const CreditReguler = () => {
 
                                                                     <div className="form-group row">
                                                                         <div className="col-sm-12 text-right">
-                                                                            <button className="btn btn-info">Simpan Pinjaman</button>
+
+                                                                            {load ? (
+                                                                                <ProgressLoad text="Simpan Pinjaman" />
+
+                                                                            ) : (
+                                                                                <button type="submit" className="btn btn-info">
+                                                                                    Simpan Pinjaman</button>
+                                                                            )}
+
+
                                                                         </div>
 
 
@@ -506,60 +603,64 @@ const CreditReguler = () => {
 
 
                                                             <div>
-                                                              
-                                                                    <div className="form-group row">
-                                                                        <label htmlFor="inputEmail3" className="col-sm-3 col-form-label">NIK</label>
-                                                                        <div className="col-3">
-                                                                            <input type="text" value={nik} onChange={(e)=>setNik(e.target.value)} className="form-control" />
-                                                                        </div>
 
+                                                                <div className="form-group row">
+                                                                    <label htmlFor="inputEmail3" className="col-sm-3 col-form-label">NIK</label>
+                                                                    <div className="col-3">
+                                                                        <input type="text" value={nik} onChange={(e) => setNik(e.target.value)} className="form-control" />
                                                                     </div>
 
-                                                                    <div className="form-group row">
-                                                                        <label htmlFor="inputEmail3" className="col-sm-3 col-form-label">Jenis Pinjaman</label>
-                                                                        <div className="col-3">
-                                                                            
-                                                                            <select className="form-control" required="required" onChange={ChangeSel}>
+                                                                </div>
+
+                                                                <div className="form-group row">
+                                                                    <label htmlFor="inputEmail3" className="col-sm-3 col-form-label">Jenis Pinjaman</label>
+                                                                    <div className="col-3">
+
+                                                                        <select className="form-control" required="required" onChange={ChangeSel}>
                                                                             {opt_type.map(option => (
                                                                                 <option key={option.value} value={option.value}>{option.text}</option>
                                                                             ))}
-                                                                         
-                                                                            </select>
-                                                                            
-                                                                        </div>
 
-                                                                        <div className="checkbox">
-                                                                                <label>
-                                                                                    <input type="checkbox" value=""/> Aktif
-                                                                                </label>
-                                                                            </div>
-
-                                                                      
-                                                                    </div>
-
-                                                                    <div className="form-group row text-right">
-                                                                  
-                                                                        
-                                                                        <div className="col-6">
-                                                                            <button onClick={handleShow} className="btn btn-primary">Show</button>
-                                                                        </div>
+                                                                        </select>
 
                                                                     </div>
+
+                                                                    <div className="checkbox">
+                                                                        <label>
+                                                                            <input type="checkbox" value="" /> Aktif
+                                                                        </label>
+                                                                    </div>
+
+
                                                                 </div>
 
-                                                
+                                                                <div className="form-group row text-right">
+
+
+                                                                    <div className="col-6">
+                                                                        <button onClick={handleShow} className="btn btn-primary">Show</button>
+                                                                    </div>
+
+                                                                </div>
+                                                            </div>
+
+
 
 
                                                         </div>
                                                         <div className="col-6 text-right">
 
+                                                            <NavLink to="/managecredit">
+                                                                <button
+                                                                    className="btn btn-info"
+                                                                >
+                                                                    Managemen Pinjaman
+                                                                </button>
 
-
-
+                                                            </NavLink>
 
                                                         </div>
                                                     </div>
-
 
 
                                                     <div className="card">
@@ -583,11 +684,11 @@ const CreditReguler = () => {
                                                                 seltype === 'REG' ? (
                                                                     <CompTabelReguler />
                                                                 ) : (
-                                                                    seltype==='KON' ? (
+                                                                    seltype === 'KON' ? (
                                                                         <CompTabeKonsumtif />
-                                                                    ):(
-                                                                        <CompTabePrt/>
-                                                                    )                                             
+                                                                    ) : (
+                                                                        <CompTabePrt />
+                                                                    )
                                                                 )
 
                                                             }
@@ -611,41 +712,113 @@ const CreditReguler = () => {
 
             <div>
                 <div className="modal fade" id="modal-edit">
-                    <div className="modal-dialog">
+                    <div className="modal-dialog modal-lg">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h4 className="modal-title">Edit Data User</h4>
+                                <h4 className="modal-title">Perubahan Data</h4>
                             </div>
                             <div className="modal-body">
 
-
-
                                 <div className="row">
+                                    <div className="col-sm-4">
+                                        <label>NIK</label>
+                                        <div
+                                            className="input-group input-group-md">
+                                            <input
+                                                type="text" readOnly
+                                                value={editData.nik}
+                                                className="form-control" />
 
-                                    <div className="col-12">
-                                        <ul className="nav nav-tabs" id="myTab" role="tablist">
-                                            <li className="nav-item" role="presentation">
-                                                <button className="nav-link active" id="home-tab" data-toggle="tab" data-target="#user-info" type="button" role="tab" aria-controls="home" aria-selected="true">Registrasi</button>
-                                            </li>
-                                            <li className="nav-item" role="presentation">
-                                                <button className="nav-link" id="profile-tab" data-toggle="tab" data-target="#user-pwd" type="button" role="tab" aria-controls="profile" aria-selected="false">Data User</button>
-                                            </li>
-                                        </ul>
-                                        <div className="tab-content" id="myTabContent">
-                                            <div className="tab-pane fade show active" id="user-info" role="tabpanel" aria-labelledby="home-tab">
+                                        </div>
+                                    </div>
 
-
-
-
+                                </div>
+                                <br />
+                                <div>
+                                    <div className="row">
+                                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                            <div className="form-group">
+                                                <label>Bulan</label>
+                                                <input type="text" readOnly value={editData.month}
+                                                    className="form-control" />
                                             </div>
-                                            <div className="tab-pane fade" id="user-pwd" role="tabpanel" aria-labelledby="home-tab">
+
+                                            {seltype == 'PRT' ? (
+                                                <div className="form-group">
+                                                    <label>Cicilan</label>
+                                                    <NumberFormat
+                                                        thousandSeparator={true}
+                                                        value={editData.credit}
+                                                        onChange={handleEdit}
+                                                        name="credit"
+                                                        className="form-control"
+                                                    />
+                                                </div>
+
+                                            ) : (
+
+                                                <div>
+
+                                                    <div className="form-group">
+                                                        <label>Cicilan Pokok</label>
+                                                        <NumberFormat
+                                                            thousandSeparator={true}
+                                                            value={editData.credit_main}
+                                                            onChange={handleEdit}
+                                                            name="credit_main"
+                                                            className="form-control"
+                                                        />
+                                                    </div>
+
+                                                    <div className="form-group">
+                                                        <label>Cicilan Bunga</label>
+                                                        <NumberFormat
+                                                            thousandSeparator={true}
+                                                            value={editData.credit_interest}
+                                                            name="credit_interest"
+                                                            onChange={handleEdit}
+                                                            className="form-control" />
+                                                    </div>
+                                                    <div className="form-group">
+                                                        <label>Cicilan Total</label>
+                                                        <NumberFormat
+                                                            thousandSeparator={true}
+                                                            value={editData.credit_total}
+                                                            name="credit_total"
+                                                            onChange={handleEdit}
+                                                            className="form-control" />
+                                                    </div>
+                                                    <div className="form-group">
+                                                        <label>Remarks</label>
+                                                        <input type="text" value={editData.remarks} onChange={handleEdit} name="remarks"
+                                                            className="form-control" />
+                                                    </div>
+
+
+                                                </div>
 
 
 
-                                            </div>
+                                            )}
+
+
+
+
+                                        </div>
+                                        <div className="modal-footer justify-content-between">
+
+                                            {load ? (
+                                                <ProgressLoad text="Simpan" />
+
+                                            ) : (
+                                                <button onClick={updateData} className="btn btn-info">
+                                                    Simpan
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>

@@ -141,7 +141,6 @@ function SalaryData() {
                 nik: niktxt
             }
         }).then((res) => {
-            console.log(res)
             setSalaryData(res.data);
         }).catch(error => console.error(`Error:${error}`));
     }

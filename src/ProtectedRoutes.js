@@ -16,11 +16,8 @@ const ProtectedRoutes = () => {
   useEffect(() => {
 
     if(!state.isAuthenticated){
-
-      
-
         http.get('/api/protected').then(response => {
-        dispatch({
+        dispatch({      
       
           type: "LOGIN",
           payload: response.data.data
@@ -29,7 +26,6 @@ const ProtectedRoutes = () => {
       })
 
     }
-   
    
   }, []);
 

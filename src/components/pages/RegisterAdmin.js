@@ -15,7 +15,7 @@ function RegisterAdmin() {
   const [statususer, setStatususer] = useState();
   const nohpRef = useRef(null);
   const nikRef = useRef(null);
-
+  const [adjust, setAdjust] = useState(false);
   const [niktxt, setNiktxt] = useState("");
   const [member, setMember] = useState([]);
   const [userinfo, setUserinfo] = useState({
@@ -23,7 +23,7 @@ function RegisterAdmin() {
     name: "",
     email: "",
     no_hp: "",
-    password: ""
+    passwords: ""
   })
   const [confirm_pass, setConfirm_pass] = useState("");
 
@@ -59,6 +59,30 @@ function RegisterAdmin() {
         created_by: 'Ahmadun',
       })
       .then((res) => {
+        if(res.data.data===true){
+          toasts("succes", "Data Berhasil Tersimpan !")
+
+        }else{
+          toasts("error", "NIK sudah terdaftar !")
+
+        }
+       
+      })
+      .catch((error) =>
+        toasts("error", "Data Gagal Tersimpan !")
+      );
+  }
+
+  async function SaveApproval(e) {
+    e.preventDefault()
+    await http
+      .put("/api/usersapprove", {
+        nik: userinfo.nik,
+        approve: adjust,
+        updated_by: 'Ahmadun',
+      })
+      .then((res) => {
+        showData();
         toasts("succes", "Data Berhasil Tersimpan !")
       })
       .catch((error) =>
@@ -66,11 +90,7 @@ function RegisterAdmin() {
       );
   }
 
-
-
-
-  function getData(e) {
-    e.preventDefault()
+  function showData(){
     http.get('/api/checkmember', {
       params: {
         nik: niktxt
@@ -78,6 +98,12 @@ function RegisterAdmin() {
     }).then((res) => {
       setMember(res.data)
     }).catch(error => console.error(`Error:${error}`));
+  }
+
+  function getData(e) {
+    e.preventDefault()
+    showData();
+   
   }
 
 
@@ -112,7 +138,6 @@ function RegisterAdmin() {
 
   const updateUserpwd = (e) => {
     e.preventDefault()
-    console.log(userinfo)
     http
       .put("/api/users/pwd",
         userinfo
@@ -215,68 +240,68 @@ function RegisterAdmin() {
 
                                 <form onSubmit={SaveUser}>
 
-                                <div className="form-group">
+                                  <div className="form-group">
 
-                                  <label>Rule</label>
-                                  <select className="form-control col-2" selected value={rule}
-                                    onChange={(e) => setRule(e.target.value)}>
-                                    <option value="0" disabled>Pilih Rule</option>
-                                    <option value="2">Anggota</option>
-                                    <option value="1">Karyawan</option>
-                                  </select>
+                                    <label>Rule</label>
+                                    <select className="form-control col-2" selected value={rule}
+                                      onChange={(e) => setRule(e.target.value)}>
+                                      <option value="0" disabled>Pilih Rule</option>
+                                      <option value="2">Anggota</option>
+                                      <option value="1">Karyawan</option>
+                                    </select>
 
-                                </div>
+                                  </div>
 
-                                <div className="form-group">
-                                  <label htmlFor="nohp">No HP</label>
-                                  <input autoComplete="off"
-                                    type="text"
-                                    ref={nohpRef}
-                                    value={no_hp}
-                                    onChange={(e) => setNo_hp(e.target.value)}
-                                    className="form-control"
-                                    id="nohp"
-                                  />
-                                </div>
-                                <div className="form-group">
-                                  <label htmlFor="email">Email</label>
-                                  <input autoComplete="off"
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="form-control"
+                                  <div className="form-group">
+                                    <label htmlFor="nohp">No HP</label>
+                                    <input autoComplete="off"
+                                      type="text"
+                                      ref={nohpRef}
+                                      value={no_hp}
+                                      onChange={(e) => setNo_hp(e.target.value)}
+                                      className="form-control"
+                                      id="nohp"
+                                    />
+                                  </div>
+                                  <div className="form-group">
+                                    <label htmlFor="email">Email</label>
+                                    <input autoComplete="off"
+                                      type="email"
+                                      value={email}
+                                      onChange={(e) => setEmail(e.target.value)}
+                                      className="form-control"
 
-                                  />
-                                </div>
-                                <div className="form-group">
-                                  <label htmlFor="password">Password</label>
-                                  <input autoComplete="off"
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="form-control"
-                                  />
-                                </div>
-                                <div className="form-group">
-                                  <label htmlFor="password_confirm">
-                                    Confirm Password
-                                  </label>
-                                  <input autoComplete="off"
-                                    type="password"
-                                    value={password_confirm}
-                                    onChange={(e) => setPassword_confirm(e.target.value)}
-                                    className="form-control"
-                                  />
-                                </div>
+                                    />
+                                  </div>
+                                  <div className="form-group">
+                                    <label htmlFor="password">Password</label>
+                                    <input autoComplete="off"
+                                      type="password"
+                                      value={password}
+                                      onChange={(e) => setPassword(e.target.value)}
+                                      className="form-control"
+                                    />
+                                  </div>
+                                  <div className="form-group">
+                                    <label htmlFor="password_confirm">
+                                      Confirm Password
+                                    </label>
+                                    <input autoComplete="off"
+                                      type="password"
+                                      value={password_confirm}
+                                      onChange={(e) => setPassword_confirm(e.target.value)}
+                                      className="form-control"
+                                    />
+                                  </div>
 
-                                <br></br>
-                                <div className="form-group">
+                                  <br></br>
+                                  <div className="form-group">
 
-                                  
-                                  <button type="submit" className="btn btn-primary">Save</button>
-                                  
 
-                                </div>
+                                    <button type="submit" className="btn btn-primary">Save</button>
+
+
+                                  </div>
 
 
                                 </form>
@@ -313,7 +338,7 @@ function RegisterAdmin() {
                             </div>
                             <div className="col-6 text-right">
 
-                            
+
 
 
 
@@ -347,6 +372,7 @@ function RegisterAdmin() {
                                     <th>No HP</th>
                                     <th>Email</th>
                                     <th>Role</th>
+                                    <th>Konfirmasi</th>
                                     <th>Aksi</th>
                                   </tr>
                                 </thead>
@@ -358,10 +384,17 @@ function RegisterAdmin() {
                                         <td>{item.name}</td>
                                         <td>{item.no_hp}</td>
                                         <td>{item.email}</td>
-                                        <td>{item.role}</td>
+                                        <td>{
+                                        item.role==1?<span>Admin</span>:<span>Anggota</span>
+                                        }</td>
+                                        <td>
+                                          {
+                                            item.email_verified_at == null ? (<span className="badge bg-danger">Pending</span>) : (<span className="badge bg-success">Approved</span>)
+                                          }</td>
+                                
                                         <td>
 
-                                          <button type="button" onClick={() => displayData(item.nik)} data-toggle="modal" data-target="#modal-edit" className="btn-sm btn-primary"><span className="fa fa-edit"/></button>
+                                          <button type="button" onClick={() => displayData(item.nik)} data-toggle="modal" data-target="#modal-edit" className="btn-sm btn-primary"><span className="fa fa-edit" /></button>
 
                                         </td>
                                       </tr>
@@ -411,16 +444,18 @@ function RegisterAdmin() {
                       <li className="nav-item" role="presentation">
                         <button className="nav-link" id="profile-tab" data-toggle="tab" data-target="#user-pwd" type="button" role="tab" aria-controls="profile" aria-selected="false">Data User</button>
                       </li>
+                      <li className="nav-item" role="presentation">
+                        <button className="nav-link" id="approve-tab" data-toggle="tab" data-target="#user-approve" type="button" role="tab" aria-controls="approve" aria-selected="false">Approval</button>
+                      </li>
                     </ul>
                     <div className="tab-content" id="myTabContent">
                       <div className="tab-pane fade show active" id="user-info" role="tabpanel" aria-labelledby="home-tab">
-
-
                         <form onSubmit={updateUserinfo}>
                           <div className="card-body">
+                            
                             <div className="form-group">
                               <label>NIK</label>
-                              <input type="text" readOnly value={userinfo.nik} onChange={handleChangeUser} className="form-control" />
+                              <input type="text" name="nik" readOnly value={userinfo.nik} onChange={handleChangeUser} className="form-control" />
                             </div>
                             <div className="form-group">
                               <label>Name</label>
@@ -450,9 +485,10 @@ function RegisterAdmin() {
 
                         <form onSubmit={updateUserpwd}>
                           <div className="card-body">
+                            
                             <div className="form-group">
                               <label>NIK</label>
-                              <input type="text" readOnly value={userinfo.nik} className="form-control" />
+                              <input type="text" readOnly name="nik"  value={userinfo.nik} className="form-control" />
                             </div>
                             <div className="form-group">
                               <label>Name</label>
@@ -461,12 +497,12 @@ function RegisterAdmin() {
 
                             <div className="form-group">
                               <label>Password</label>
-                              <input type="password" name="password" value={userinfo.password} onChange={handleChangeUser} className="form-control" />
+                              <input type="text" name="password" value={userinfo.password} onChange={handleChangeUser} className="form-control" />
                             </div>
 
                             <div className="form-group">
                               <label>Confirm Password</label>
-                              <input type="password" name="password-conf" value={confirm_pass} onChange={(e) => setConfirm_pass(e.target.value)} className="form-control" />
+                              <input type="text" name="confirm_pass" value={confirm_pass} onChange={(e) => setConfirm_pass(e.target.value)} className="form-control" />
                             </div>
 
 
@@ -475,6 +511,30 @@ function RegisterAdmin() {
                             <button type="submit" className="btn btn-primary">Save</button>
                           </div>
                         </form>
+
+                      </div>
+
+                      <div className="tab-pane fade" id="user-approve" role="tabpanel" aria-labelledby="approve-tab">
+
+                      <form onSubmit={SaveApproval}>
+                          <div className="card-body">
+                            <div className="form-group">
+                              <label>NIK</label>
+                              <input type="text" readOnly value={userinfo.nik} className="form-control" />
+                            </div>
+
+
+                            <div className="form-group">
+                              <div className="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                                <input type="checkbox" checked={adjust} onChange={e => setAdjust(e.target.checked)} className="custom-control-input" id="customSwitch3" />
+                                <label className="custom-control-label" htmlFor="customSwitch3">{adjust ? ("Approve") : "Pending"}</label>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="card-footer">
+                            <button type="submit" className="btn btn-primary">Save</button>
+                          </div>
+                        </form> 
 
                       </div>
                     </div>

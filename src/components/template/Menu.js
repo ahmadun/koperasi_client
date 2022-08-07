@@ -29,7 +29,7 @@ function Menu() {
 
                             <li className="nav-header">ADMIN</li>
 
-                            <li className="nav-item">
+                            {/* <li className="nav-item">
                                 <NavLink to="/kasbonentry" className="nav-link">
                                     <i className="nav-icon fas fa-book" />
                                     <p>
@@ -37,15 +37,15 @@ function Menu() {
                                         <span className="right badge badge-danger">Kasir</span>
                                     </p>
                                 </NavLink>
-                            </li>
-                            <li className="nav-item">
+                            </li> */}
+                            {/* <li className="nav-item">
                                 <NavLink to="/salarydata" className="nav-link">
                                     <i className="nav-icon far fa-copy" />
                                     <p>
                                         Data Gaji
                                     </p>
                                 </NavLink>
-                            </li>
+                            </li> */}
                             <li className="nav-item">
                                 <NavLink to="/registrasiuser" className="nav-link">
                                     <i className="nav-icon far fa-edit" />
@@ -129,12 +129,12 @@ function Menu() {
                                     <p>Pinjaman</p>
                                 </NavLink>
                             </li>
-                            <li className="nav-item">
+                            {/* <li className="nav-item">
                                 <NavLink to="/belanjakontan" className="nav-link">
                                     <i className="nav-icon fas fa-cash-register" />
                                     <p>Input Belanja Kontan</p>
                                 </NavLink>
-                            </li>
+                            </li> */}
 
                         </ul>
                     </nav>
