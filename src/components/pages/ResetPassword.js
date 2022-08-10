@@ -86,17 +86,17 @@ const ResetPassword = () => {
                             
                             <div className="form-group">
                               <label>Password Lama</label>
-                              <input type="password" name="passwordsold" value={userinfo.passwordsold} onChange={handleChangeUser}  className="form-control" />
+                              <input type="password" required name="passwordsold" value={userinfo.passwordsold} onChange={handleChangeUser}  className="form-control" />
                             </div>
 
                             <div className="form-group">
                               <label>Password Baru</label>
-                              <input type="password" name="password" value={userinfo.password} onChange={handleChangeUser} className="form-control" />
+                              <input type="password" required name="password" value={userinfo.password} onChange={handleChangeUser} className="form-control" />
                             </div>
 
                             <div className="form-group">
                               <label>Konfirmasi Password</label>
-                              <input type="password" name="passwordsconf" value={userinfo.passwordsconf} onChange={handleChangeUser} className="form-control" />
+                              <input type="password" required name="passwordsconf" value={userinfo.passwordsconf} onChange={handleChangeUser} className="form-control" />
                             </div>
 
 

@@ -17,6 +17,7 @@ const CreditReguler = () => {
     const [konsum, setKonsum] = useState([]);
     const [start, setStart] = useState(new Date());
     const [sts, seSts] = useState(false);
+    const [checkaktif, setCheckaktif] = useState(true);
     const [newData, setNewData] = useState({
         nik: "",
         code: "",
@@ -44,6 +45,7 @@ const CreditReguler = () => {
     const [lockons, setLockons] = useState(false);
     const [creedittype, setCreedittype] = useState("");
     const [nik, setNik] = useState("");
+    const [name, setName] = useState("");
     const [load, setLoad] = useState();
 
     const options = [
@@ -69,6 +71,32 @@ const CreditReguler = () => {
         setCreedittype(e.target.id)
 
 
+    }
+
+    const checkName=(nik)=>{
+        if(name==="" && newData.nik!=""){
+            http
+            .get("/api/checkmember", {
+                params: {
+                    nik: nik,
+                },
+            })
+            .then((res) => {
+                if(res.data.length>0){
+                    setName(res.data[0].name);
+                    
+                }else{
+                    setName("");
+                }
+                
+            })
+            .catch((error) => { setName(""); console.error(`Error:${error}`)});
+
+
+        }else{
+            setName("")
+        }
+      
     }
 
     useEffect(() => {
@@ -106,8 +134,23 @@ const CreditReguler = () => {
 
 
     const handleShow = () => {
+
+        showData(nik,seltype)
+       
+
+    }
+
+
+    function showData(nik,seltype){
+
         setLoad(true);
-        http.get(`api/detail_credit?nik=${nik}&code=${seltype}`).then((res) => {
+        let status=0
+        if(checkaktif){
+            status=0
+        }else{
+            status=1
+        }
+        http.get(`api/detail_credit?nik=${nik}&code=${seltype}&sts=${status}`).then((res) => {
             setLoad(false);
             setDatalist(res.data.data);
             setTotals(res.data.total);
@@ -133,6 +176,7 @@ const CreditReguler = () => {
                 setLoad(false)
                 if (res.data.data == true) {
                     toasts("succes", "Data Berhasil Tersimpan !");
+                    showData(nik,seltype)
                     seSts(false);
                 } else {
                     toasts("error", "Data Gagal Tersimpan !");
@@ -144,6 +188,8 @@ const CreditReguler = () => {
 
     const handleProcess = async (e) => {
         e.preventDefault();
+        if(name==="")
+            return
         setLoad(true);
         await http
             .post(`/api/processcredit`, data, {
@@ -156,6 +202,9 @@ const CreditReguler = () => {
                 if (res.data.data == true) {
                     setLoad(false);
                     toasts("succes", "Data Berhasil Tersimpan !");
+                }else{
+                    setLoad(false);
+                    toasts("error", res.data.message);
                 }
             })
             .catch((error) => console.error(`Error:${error}`));
@@ -426,6 +475,7 @@ const CreditReguler = () => {
                                                                         <label className="col-sm-4 col-form-label">Jenis Konsumptif</label>
 
                                                                         <div className="col-sm-8">
+                                                                       
 
                                                                             <select disabled={lockons} className="form-control" value={newData.code} name="code" onChange={handleChange} required="required">
                                                                                 {konsum.map((item, i) => (
@@ -441,15 +491,17 @@ const CreditReguler = () => {
 
                                                                     <div className="form-group row">
                                                                         <label className="col-sm-4 col-form-label">Anggota</label>
-                                                                        <div className="col-sm-8">
-                                                                            <input type="text" autoComplete="off" name="nik" value={newData.nik} onChange={handleChange} className="form-control" />
-
+                                                                        <div className="col-sm-3">
+                                                                            <input type="text" autoComplete="off" onBlur={(e)=>checkName(e.target.value)} name="nik" value={newData.nik} onChange={handleChange} className="form-control" />
+                                                                        </div>
+                                                                        <div className="col-sm-5">
+                                                                            <input type="text" readOnly  name="name" value={name} onChange={(e)=>setName(e.target.value)} className="form-control" />
                                                                         </div>
                                                                     </div>
                                                                     <div className="form-group row">
                                                                         <label className="col-sm-4 col-form-label">Jumlah Pinjaman</label>
                                                                         <div className="col-sm-8">
-                                                                            <NumberFormat className="form-control" autoComplete="off" name="credit_main" onChange={handleChange}
+                                                                            <NumberFormat required className="form-control" autoComplete="off" name="credit_main" onChange={handleChange}
                                                                                 value={newData.credit_main}
                                                                                 thousandSeparator={true}
                                                                                 prefix={"Rp"}
@@ -460,7 +512,7 @@ const CreditReguler = () => {
                                                                     <div className="form-group row">
                                                                         <label className="col-sm-4 col-form-label">Jangka Waktu</label>
                                                                         <div className="col-sm-2">
-                                                                            <NumberFormat className="form-control" autoComplete="off" name="tenor"
+                                                                            <NumberFormat required className="form-control" autoComplete="off" name="tenor"
                                                                                 value={newData.tenor} onChange={handleChange}
                                                                             />
                                                                         </div>
@@ -480,7 +532,7 @@ const CreditReguler = () => {
                                                                         <label className="col-sm-4 col-form-label">Bunga Perbulan</label>
                                                                         <div className="col-sm-8">
 
-                                                                            <NumberFormat className="form-control" autoComplete="off" name="credit_interest" onChange={handleChange}
+                                                                            <NumberFormat required className="form-control" autoComplete="off" name="credit_interest" onChange={handleChange}
                                                                                 value={newData.credit_interest}
                                                                                 thousandSeparator={true}
                                                                                 prefix={"Rp"}
@@ -491,7 +543,7 @@ const CreditReguler = () => {
                                                                     <div className="form-group row">
                                                                         <label className="col-sm-4 col-form-label">Angsuran Perbulan</label>
                                                                         <div className="col-sm-8">
-                                                                            <NumberFormat className="form-control" autoComplete="off" name="credit_total" onChange={handleChange}
+                                                                            <NumberFormat required className="form-control" autoComplete="off" name="credit_total" onChange={handleChange}
                                                                                 value={newData.credit_total}
                                                                                 thousandSeparator={true}
                                                                                 prefix={"Rp"}
@@ -627,7 +679,7 @@ const CreditReguler = () => {
 
                                                                     <div className="checkbox">
                                                                         <label>
-                                                                            <input type="checkbox" value="" /> Aktif
+                                                                            <input type="checkbox" defaultChecked={true} value={checkaktif} onChange={()=>setCheckaktif(!checkaktif)}/> Aktif
                                                                         </label>
                                                                     </div>
 

@@ -7,6 +7,7 @@ import { AuthContext } from '../../App';
 function Menu() {
 
   
+    
 
     const { state } = useContext(AuthContext)
 
@@ -48,6 +49,16 @@ function Menu() {
                             </li> */}
                             <li className="nav-item">
                                 <NavLink to="/registrasiuser" className="nav-link">
+                                    <i className="nav-icon far fa-edit" />
+                                    <p>
+                                        Registrasi User Akun
+                                    </p>
+                                </NavLink>
+                            </li>
+
+
+                            <li className="nav-item">
+                                <NavLink to="/registrasimember" className="nav-link">
                                     <i className="nav-icon far fa-edit" />
                                     <p>
                                         Registrasi Anggota

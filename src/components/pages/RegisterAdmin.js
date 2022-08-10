@@ -91,7 +91,7 @@ function RegisterAdmin() {
   }
 
   function showData(){
-    http.get('/api/checkmember', {
+    http.get('/api/checkuser', {
       params: {
         nik: niktxt
       }
@@ -179,7 +179,7 @@ function RegisterAdmin() {
               <div className="card card-primary">
                 <div className="card-header">
                   <h3 className="card-title">
-                    Registrasi Anggota
+                    Registrasi User
                   </h3>
                 </div>
 

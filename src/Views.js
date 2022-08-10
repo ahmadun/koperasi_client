@@ -21,6 +21,7 @@ import ManageCredit from "./components/pages/ManageCredit";
 import { AuthContext } from "./App";
 import AuthUser from "./components/services/AuthUser";
 import ResetPassword from "./components/pages/ResetPassword";
+import RegistrasiMember from "./components/pages/RegistrasiMember";
 
 const Views = () => {
   const { http } = AuthUser();
@@ -58,12 +59,16 @@ const Views = () => {
           <Route index element={<ResetPassword />} />
         </Route>
 
+        <Route exact path="/registrasimember" element={<Layout />}>
+          {state.role === 1 &&
+            <Route index element={<RegistrasiMember />} />
+          }
+        </Route>
 
         <Route exact path="/simpanan" element={<Layout />}>
           {state.role === 2 &&
             <Route index element={<SimpananMain />} />
           }
-
         </Route>
         <Route exact path="/pinjaman" element={<Layout />}>
           {state.role === 2 &&
