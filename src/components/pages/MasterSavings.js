@@ -354,7 +354,7 @@ function MasterSavings() {
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h4 className="modal-title">Default Modal</h4>
+                            <h4 className="modal-title">Upload Master Simpanan</h4>
                             <button
                                 type="button"
                                 className="close"
@@ -459,12 +459,6 @@ function MasterSavings() {
                                         </div>
                                     </div>
                                     <div className="modal-footer justify-content-between">
-                                        {/* <button
-                                            type="button"
-                                            className="btn btn-danger"
-                                            data-dismiss="modal">
-                                            Delete
-                                        </button> */}
                                         {load ? (
                                             <ProgressLoad text="Simpan" />
 

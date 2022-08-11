@@ -25,12 +25,14 @@ function SavingsMaintenance() {
     const [periodadd, setPeriodadd] = useState(new Date());
     const [dateadd, setDateadd] = useState(new Date());
     const { state } = useContext(AuthContext);
+    const [ names,setNames]=useState("")
     const [newData, setNewData] = useState({
         nik: "",
+        name: "",
         date_save: period,
         period: dateadd,
-        save_main: 0,
-        save_mand: 0,
+        save_main: "",
+        save_mand: "",
         save_volu: "",
         created_by: ""
     });
@@ -75,7 +77,11 @@ function SavingsMaintenance() {
     const displayData = (nik) => {
         seSts(true);
         const datanow = data.filter((newData) => newData.nik === nik);
-        datanow.map((item, i) => { });
+        datanow.map((item, i) => { 
+            setNewData(item)
+            setNames(item.name)
+
+        });
     };
 
     const handleChange = (e) => {
@@ -132,6 +138,49 @@ function SavingsMaintenance() {
             .catch((error) => console.error(`Error:${error}`));
     };
 
+
+    const editData = async (e) => {
+        e.preventDefault();
+
+       
+
+        setLoad(true)
+
+        newData.save_volu=newData.save_volu===null || newData.save_volu===""?newData.save_volu="0":newData.save_volu;
+        newData.save_main=newData.save_main===null || newData.save_main===""?newData.save_main="0":newData.save_main;
+        newData.save_mand=newData.save_mand===null || newData.save_mand===""?newData.save_mand="0":newData.save_mand;
+
+
+        newData.save_volu =Number.isInteger(newData.save_volu)===false? newData.save_volu.replaceAll(',', ''):newData.save_volu;
+        newData.save_main =Number.isInteger(newData.save_main)===false? newData.save_main.replaceAll(',', ''):newData.save_main;
+        newData.save_mand =Number.isInteger(newData.save_mand)===false? newData.save_mand.replaceAll(',', ''):newData.save_mand;
+       
+
+        newData.date_save = moment.utc(dateadd).format("yyyy-MM-DD")
+        newData.period = moment.utc(periodadd).format("yyyyMM")
+        newData.created_by = state.nik
+
+        console.log(newData)
+        await http
+            .put("/api/savingmain", newData)
+            .then((res) => {
+                setLoad(false)
+                if (res.data.data == true) {
+                    toasts("succes", "Data Diupdate Tersimpan !");
+                    clearForm();
+                    seSts(false);
+                    getData();
+                } else {
+                    if (res.data.data == 2627) {
+                        toasts("error", "Data sudah ada!");
+                    } else {
+                        toasts("error", "Data Gagal Tersimpan !");
+                    }
+                }
+            })
+            .catch((error) => console.error(`Error:${error}`));
+    };
+
     const handleFile = async (e) => {
         const file = e.target.files[0];
         const data = await file.arrayBuffer();
@@ -173,7 +222,6 @@ function SavingsMaintenance() {
     function getData() {
         const periods = moment.utc(period).format("yyyyMM")
 
-        console.log(niktxt)
         http
             .get("/api/savingmain", {
                 params: {
@@ -379,8 +427,7 @@ function SavingsMaintenance() {
                                                                                 onClick={() => displayData(item.nik)}
                                                                                 data-toggle="modal"
                                                                                 data-target="#modal-edit"
-                                                                                className="btn-sm btn-primary"
-                                                                            >
+                                                                                className="btn-sm btn-primary">
                                                                                 <span className="fa fa-edit"></span>
                                                                             </button>
 
@@ -545,6 +592,103 @@ function SavingsMaintenance() {
                     </div>
                 </div>
             </div>
+
+            <div className="modal fade" id="modal-edit">
+                <div className="modal-dialog modal-lg">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h4 className="modal-title">Edit Data User</h4>
+                        </div>
+                        <div className="modal-body">
+                            <div className="row">
+                                <div className="col-sm-4">
+                                    <label>NIK</label>
+
+                                    <form
+                                        className="input-group input-group-md"
+                                        onSubmit={ChecNik}>
+                                        <input
+                                            type="text" readOnly={sts} name="nik" onChange={handleChange}
+                                            value={newData.nik} 
+                                            className="form-control" />
+                                        <span className="input-group-append">
+                                            <button type="submit" className="btn btn-info btn-flat">
+                                                Check
+                                            </button>
+                                        </span>
+                                    </form>
+                                </div>
+
+                                <div className="col-sm-8">
+                                    <label>NAME</label>
+                                    <input
+                                        type="text" name="name"
+                                        value={names} onChange={(e)=>setNames(e.target.value)} readOnly={sts}
+                                        className="form-control"
+                                    />
+                                </div>
+                            </div>
+                            <br />
+                            <form onSubmit={editData} autoComplete="off">
+                                <div className="row">
+                                    <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                        <div className="form-group">
+                                            <label>Simpanan Pokok</label>
+                                            <NumberFormat
+                                                thousandSeparator={true}
+                                                value={newData.save_main}
+                                                getInputRef={inputRef}
+                                                name="save_main"
+                                                onChange={handleChange}
+                                                className="form-control" />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Simpanan Wajib</label>
+                                            <NumberFormat
+                                                thousandSeparator={true}
+                                                value={newData.save_mand}
+                                                onChange={handleChange}
+                                                name="save_mand"
+                                                className="form-control"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Simpanan Sukarela</label>
+                                            <NumberFormat
+                                                thousandSeparator={true}
+                                                value={newData.save_volu}
+                                                name="save_volu"
+                                                onChange={handleChange}
+                                                className="form-control" />
+                                        </div>
+                                    </div>
+                                    <div className="modal-footer justify-content-between">
+                                        {load ? (
+                                            <ProgressLoad text="Simpan" />
+
+                                        ) : (
+                                            <button type="submit" className="btn btn-info">
+                                                Simpan
+                                            </button>
+                                        )}
+
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div className="modal-footer">
+                            <button
+                                type="button"
+                                className="btn btn-default"
+                                data-dismiss="modal">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     );
 }
